@@ -1,7 +1,7 @@
 #/usr/bin/python3
 from picamera import PiCamera
 from pydng.core import RPICAM2DNG
-from controls import TrackballController
+from controls import Light, TrackballController
 import datetime
 import fractions
 import os
@@ -21,8 +21,8 @@ dng = RPICAM2DNG()
 running = False
 buttons = TrackballController()
 statusDictionary = {'message': '', 'action': '', 'colorR': 0, 'colorG': 0, 'colorB': 0, 'colorW': 0}
-buttonDictionary = {'switchMode': 'default', 'shutterUp': False, 'shutterDown': False, 'isoUp': False, 'isoDown': False, 'evUp': False, 'evDown': False, 'bracketUp': False, 'bracketDown': False, 'capture': False, 'captureVideo': False, 'isRecording': False}
-	
+buttonDictionary = {'switchMode': 0, 'shutterUp': False, 'shutterDown': False, 'isoUp': False, 'isoDown': False, 'evUp': False, 'evDown': False, 'bracketUp': False, 'bracketDown': False, 'capture': False, 'captureVideo': False, 'isRecording': False, 'lightR': 0, 'lightB': 0, 'lightG': 0, 'lightW': 0}
+
 
 previewVisible = False
 previewWidth = 800

@@ -1,6 +1,6 @@
 # Camera Zero
 
-This program makes the use of a Raspberry Pi HQ camera a little more powerful and user-friendly.   It unleashes easy exposure bracketing, timelapse functionality, etc.   It also adds on-screen controls for use with touch screens, additional error handling, and presets for some common settings.
+Combining this program with a Raspberry Pi HQ camera, a Raspberry Pi Zero, a PiMoRoNi trackball breakout, and an Adafruit 16 LED NeoPixel ring will result in a neat little screenless camera that can be controlled with your thumb.
 
 ---
 ## Getting Started
@@ -8,6 +8,7 @@ This program makes the use of a Raspberry Pi HQ camera a little more powerful an
 - Use [raspi-config](https://www.raspberrypi.org/documentation/configuration/raspi-config.md) to:
   - Set the Memory Split value to a value of at least 256MB
   - Enable the CSI camera interface
+  - Enable the I2C interface
   - Set up your WiFi connection
 - Connect the Raspberry Pi HQ Camera to your Raspberry Pi
 
