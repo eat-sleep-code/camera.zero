@@ -1,15 +1,9 @@
 #/usr/bin/python3
-import tkinter as tk
-from tkinter import ttk
-
 from picamera import PiCamera
 from pydng.core import RPICAM2DNG
-from controls import OnScreenControls, Buttons
-import threading
-import argparse
+from controls import TrackballController
 import datetime
 import fractions
-import keyboard
 import os
 import signal
 import subprocess
@@ -18,90 +12,51 @@ import threading
 import time
 
 
-version = '2021.02.11'
+version = '2021.02.26'
 
 camera = PiCamera()
 PiCamera.CAPTURE_TIMEOUT = 1500
 camera.resolution = camera.MAX_RESOLUTION
 dng = RPICAM2DNG()
 running = False
-onScreen = OnScreenControls()
-onScreenButtons = Buttons()
-statusDictionary = {'message': '', 'action': ''}
-buttonDictionary = {'exit': False, 'shutterUp': False, 'shutterDown': False, 'isoUp': False, 'isoDown': False, 'evUp': False, 'evDown': False, 'bracketUp': False, 'bracketDown': False, 'capture': False, 'captureVideo': False}
-
-
-# === Argument Handling ========================================================
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--action', dest='action', help='Set the command action')
-parser.add_argument('--shutter', dest='shutter', help='Set the shutter speed (milliseconds)')
-parser.add_argument('--iso', dest='iso', help='Set the ISO')
-parser.add_argument('--exposure', dest='exposure', help='Set the exposure mode')
-parser.add_argument('--ev', dest='ev', help='Set the exposure compensation (+/-25)')
-parser.add_argument('--bracket', dest='bracket', help='Set the exposure bracketing value')
-parser.add_argument('--awb', dest='awb', help='Set the Auto White Balance (AWB) mode')
-parser.add_argument('--outputFolder', dest='outputFolder', help='Set the folder where images will be saved')
-parser.add_argument('--raw', dest='raw', help='Set whether DNG files are created in addition to JPEG files')
-parser.add_argument('--timer', dest='timer', help='Set self-timer or interval (seconds)')
-parser.add_argument('--previewWidth', dest='previewWidth', help='Set the preview window width')
-parser.add_argument('--previewHeight', dest='previewHeight', help='Set the preview window height')
-args = parser.parse_args()
+buttons = TrackballController()
+statusDictionary = {'message': '', 'action': '', 'colorR': 0, 'colorG': 0, 'colorB': 0, 'colorW': 0}
+buttonDictionary = {'switchMode': 'default', 'shutterUp': False, 'shutterDown': False, 'isoUp': False, 'isoDown': False, 'evUp': False, 'evDown': False, 'bracketUp': False, 'bracketDown': False, 'capture': False, 'captureVideo': False, 'isRecording': False}
 	
+
 previewVisible = False
-try:
-	previewWidth = args.previewWidth or 800
-	previewWidth = int(previewWidth)
-	previewHeight = args.previewHeight or 460
-	previewHeight = int(previewHeight)
-except Exception as ex: 
-	previewWidth = 800
-	previewHeight = 460
+previewWidth = 800
+previewHeight = 460
 	
+action = 'capture'
 
-action = args.action or 'capture'
-action = action.lower()
-
-
-shutter = args.shutter or 'auto'
+shutter = 'auto'
 shutterLong = 30000
 shutterLongThreshold = 1000
 shutterShort = 0
 defaultFramerate = 30
 
-
-iso = args.iso or 'auto'
+iso = 'auto'
 isoMin = 100
 isoMax = 1600
 
+exposure = 'auto'
 
-exposure = (args.exposure or 'auto').lower()
-
-
-ev = args.ev or 0
+ev = 0
 evMin = -25
 evMax = 25
 
-
-bracket = args.bracket or 0
+bracket = 0
 bracketLow = 0
 bracketHigh = 0
 
+awb = 'auto'
 
-awb = (args.awb or 'auto').lower()
+outputFolder = 'dcim/'
 
+timer = 0
 
-outputFolder = args.outputFolder or 'dcim/'
-if outputFolder.endswith('/') == False:
-	outputFolder = outputFolder+'/'
-
-
-timer = args.timer or 0
-timer = int(timer)
-
-
-raw = args.raw or True
-
+raw = True
 
 
 
@@ -125,19 +80,7 @@ def showInstructions(clearFirst = False, wait = 0):
 	else:
 		print(' ----------------------------------------------------------------------')
 
-	print('\n Press s+\u25B2 or s+\u25BC to change shutter speed')
-	print('\n Press i+\u25B2 or i+\u25BC to change ISO')
-	print('\n Press c+\u25B2 or c+\u25BC to change exposure compensation')
-	print('\n Press b+\u25B2 or b+\u25BC to change exposure bracketing')
-	print('\n Press [p] to toggle the preview window')
-
-	if action == 'timelapse':			 		
-		print('\n Press the [space] bar to begin a timelapse ')
-	else:
-		print('\n Press the [space] bar to take photos ')
-
-	print('\n Press \u241B to exit ')
-	time.sleep(wait)
+		time.sleep(wait)
 	return
 
 # ------------------------------------------------------------------------------
@@ -366,7 +309,7 @@ def createControls():
 	global buttonDictionary
 	
 	running = True
-	onScreen.create(running, statusDictionary, buttonDictionary)
+	TrackballController.watch(running, statusDictionary, buttonDictionary)
 	
 # === Image Capture ============================================================
 
@@ -427,21 +370,16 @@ try:
 		showInstructions(False, 0)
 		showPreview(0, 0, previewWidth, previewHeight)
 		
-		# print('Key Pressed: ' + keyboard.read_hotkey())
 		while True:
 			try:
-				if keyboard.is_pressed('ctrl+c') or keyboard.is_pressed('esc') or buttonDictionary['exit'] == True:
+				if buttonDictionary['exit'] == True:
 					# clear()
 					echoOn()
 					sys.exit(1)
 					break
 					
-				# Help
-				elif keyboard.is_pressed('/') or keyboard.is_pressed('shift+/'):
-					showInstructions(True, 0.5)	
-
 				# Capture
-				elif keyboard.is_pressed('space') or buttonDictionary['capture'] == True:
+				elif buttonDictionary['capture'] == True:
 					
 					if mode == 'persistent':
 						# Normal photo
@@ -514,22 +452,15 @@ try:
 					
 					time.sleep(1)
 
-				# Preview Toggle				
-				elif keyboard.is_pressed('p'):
-					if previewVisible == True:
-						hidePreview()
-					else:
-						showPreview(0, 0, previewWidth, previewHeight)
-
 				# Shutter Speed	
-				elif keyboard.is_pressed('s+up') or buttonDictionary['shutterUp'] == True:
+				elif buttonDictionary['shutterUp'] == True:
 					if shutter == 0:
 						shutter = shutterShort
 					if shutter > shutterShort and shutter <= shutterLong:					
 						shutter = int(shutter / 1.5)
 					setShutter(shutter, 0.25)
 					buttonDictionary.update({'shutterUp': False})
-				elif keyboard.is_pressed('s+down') or buttonDictionary['shutterDown'] == True:
+				elif buttonDictionary['shutterDown'] == True:
 					if shutter == 0:						
 						shutter = shutterLong
 					elif shutter < shutterLong and shutter >= shutterShort:					
@@ -540,14 +471,14 @@ try:
 					buttonDictionary.update({'shutterDown': False})
 
 				# ISO
-				elif keyboard.is_pressed('i+up') or buttonDictionary['isoUp'] == True:
+				elif buttonDictionary['isoUp'] == True:
 					if iso == 0:
 						iso = isoMin
 					if iso >= isoMin and iso < isoMax:					
 						iso = int(iso * 2)
 					setISO(iso, 0.25)
 					buttonDictionary.update({'isoUp': False})
-				elif keyboard.is_pressed('i+down') or buttonDictionary['isoDown'] == True:
+				elif buttonDictionary['isoDown'] == True:
 					if iso == 0:
 						iso = isoMax
 					elif iso <= isoMax and iso > isoMin:					
@@ -558,23 +489,23 @@ try:
 					buttonDictionary.update({'isoDown': False})
 
 				# Exposure Compensation
-				elif keyboard.is_pressed('c+up') or buttonDictionary['evUp'] == True:
+				elif buttonDictionary['evUp'] == True:
 					if ev >= evMin and ev < evMax:					
 						ev = int(ev + 1)
 						setEV(ev, 0.25)
 						buttonDictionary.update({'evUp': False})
-				elif keyboard.is_pressed('c+down') or buttonDictionary['evDown'] == True:
+				elif buttonDictionary['evDown'] == True:
 					if ev <= evMax and ev > evMin:					
 						ev = int(ev - 1)
 						setEV(ev, 0.25)
 						buttonDictionary.update({'evDown': False})
 				# Exposure Bracketing
-				elif keyboard.is_pressed('b+up') or buttonDictionary['bracketUp'] == True:
+				elif buttonDictionary['bracketUp'] == True:
 					if bracket < evMax:
 						bracket = int(bracket + 1)
 						setBracket(bracket, 0.25)
 						buttonDictionary.update({'bracketUp': False})
-				elif keyboard.is_pressed('b+down') or buttonDictionary['bracketDown'] == True:
+				elif buttonDictionary['bracketDown'] == True:
 					if bracket > 0:					
 						bracket = int(bracket - 1)
 						setBracket(bracket, 0.25)
