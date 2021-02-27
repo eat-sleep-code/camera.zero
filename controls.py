@@ -19,7 +19,7 @@ class Buttons():
 			if switchMode == 'default' or switchMode == 'capture':
 				if int(click) == 1:
 					buttonDictionary.update({'capture': True})
-					setColor(0, 0, 0, 255, 'flash')
+					setColor(0, 255, 255, 64, 'flash')
 				else: 
 					buttonDictionary.update({'capture': False})
 					setColor(0, 0, 0, 64, 'default')
