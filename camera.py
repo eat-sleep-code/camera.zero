@@ -311,6 +311,12 @@ def createControls():
 	running = True
 	TrackballController.watch(running, statusDictionary, buttonDictionary)
 	
+# -------------------------------------------------------------------------------
+def darkMode():
+	Lights.off()
+	TrackballController.off()
+
+
 # === Image Capture ============================================================
 
 controlsThread = threading.Thread(target=createControls)
@@ -539,5 +545,6 @@ try:
 		sys.exit(0)
 
 except KeyboardInterrupt:
+	darkMode()
 	echoOn()
 	sys.exit(1)

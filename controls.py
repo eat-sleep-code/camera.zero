@@ -6,11 +6,15 @@ import time
 from trackball import TrackBall
 
 trackball = TrackBall(interrupt_pin=4)
-pixel = neopixel.NeoPixel(board.D18, 16, pixel_order=neopixel.RGBW)   # GPIO 18 = PIN 12  /// 16 = Number of NeoPixels
+pixel = neopixel.NeoPixel(board.D18, 16, pixel_order=neopixel.GRBW)   # GPIO 18 = PIN 12  /// 16 = Number of NeoPixels
 	
 class Light():
 
 	# === NeoPixel RGBW LED Color Handlers ====================================
+
+	def off():
+		pixels.fill((0,0,0,0))
+		pixels.show()
 
 	def updateLight():
 		red = buttonDictionary['lightR']
@@ -26,10 +30,11 @@ class TrackballController():
 
 	# === Trackball/Button LED Color Handlers =================================
 
+	def off():
+		trackball.set_rgbw(0, 0, 0, 0)
+
 	def setColorToDefault():
 		trackball.set_rgbw(0, 0, 0, 64)
-
-
 
 	def setColor(r, g, b, w, mode):
 		if mode == 'flash':
