@@ -26,10 +26,8 @@ sudo chmod +x ~/install-camera.sh && ~/install-camera.sh
 
 ## Usage
 ```
-camera <options>
+camera.zero
 ```
-
-
 
 ---
 
