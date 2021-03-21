@@ -61,22 +61,22 @@ class TrackballController():
 
 	def setSwitchModeColor():
 		currentMode = buttonDictionary['switchMode']
-		if currentMode = 2:
-			setColor( 60, 30, 0, 0 'static')
-		if currentMode = 3:
-			setColor( 30, 30, 0, 0 'static')
-		if currentMode = 4:
-			setColor( 0, 30, 30, 0 'static')
-		if currentMode = 5:
-			setColor( 30, 0, 30, 0 'static')
-		elif currentMode = 6:
-			setColor( 30, 0, 0, 0 'static')
-		elif currentMode = 7:
-			setColor( 0, 30, 0, 0 'static')
-		elif currentMode = 8:
-			setColor( 0, 0, 30, 0 'static')
-		elif currentMode = 9:
-			setColor( 0, 0, 0, 30 'static')
+		if currentMode == 2:
+			setColor( 60, 30, 0, 0, 'static')
+		elif currentMode == 3:
+			setColor( 30, 30, 0, 0, 'static')
+		elif currentMode == 4:
+			setColor( 0, 30, 30, 0, 'static')
+		elif currentMode == 5:
+			setColor( 30, 0, 30, 0, 'static')
+		elif currentMode == 6:
+			setColor( 30, 0, 0, 0, 'static')
+		elif currentMode == 7:
+			setColor( 0, 30, 0, 0, 'static')
+		elif currentMode == 8:
+			setColor( 0, 0, 30, 0, 'static')
+		elif currentMode == 9:
+			setColor( 0, 0, 0, 30, 'static')
 
 
 
@@ -105,7 +105,7 @@ class TrackballController():
 					buttonDictionary.update({'captureVideo': True})
 					buttonDictionary.update({'isRecording': True})
 					setColor(255, 0, 0, 0, 'pulse')
-				else 
+				else: 
 					buttonDictionary.update({'captureVideo': False})
 					buttonDictionary.update({'isRecording': False}) 
 					setColorToDefault()
