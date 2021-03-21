@@ -41,7 +41,7 @@ class TrackballController():
 			trackball.set_rgbw(r, g, b, w)
 			time.sleep(0.2)
 			setColorToDefault()
-		elif mode = 'pulse':
+		elif mode == 'pulse':
 			trackball.set_rgbw(r, g, b, w)
 			#TODO: Make pulse -- threaded?
 		else:
