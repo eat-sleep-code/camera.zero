@@ -6,7 +6,7 @@ import time
 from trackball import TrackBall
 
 trackball = TrackBall(interrupt_pin=4)
-pixel = neopixel.NeoPixel(board.D18, 16, pixel_order=neopixel.GRBW)   # GPIO 18 = PIN 12  /// 16 = Number of NeoPixels
+pixels = neopixel.NeoPixel(board.D18, 16, pixel_order=neopixel.GRBW)   # GPIO 18 = PIN 12  /// 16 = Number of NeoPixels
 	
 class Light():
 
@@ -245,7 +245,7 @@ class TrackballController():
 
 	def watch(running, statusDictionary, buttonDictionary):
 		while running == True:
-			handleButtonChanges(buttonDictionary)
+			TrackballController.handleButtonChanges(buttonDictionary)
 
 
 
