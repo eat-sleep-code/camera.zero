@@ -378,14 +378,9 @@ try:
 		
 		while True:
 			try:
-				if buttonDictionary['exit'] == True:
-					# clear()
-					echoOn()
-					sys.exit(1)
-					break
 					
 				# Capture
-				elif buttonDictionary['capture'] == True:
+				if buttonDictionary['capture'] == True:
 					
 					if mode == 'persistent':
 						# Normal photo
