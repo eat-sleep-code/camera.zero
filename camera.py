@@ -12,7 +12,7 @@ import threading
 import time
 
 
-version = '2021.02.26'
+version = '2021.03.21'
 
 camera = PiCamera()
 PiCamera.CAPTURE_TIMEOUT = 1500
