@@ -53,9 +53,9 @@ class TrackballController():
 
 	def setSwitchModeToDefault(buttonDictionary):
 		if buttonDictionary['isRecording'] == False:
-			setColorToDefault()
+			TrackballController.setColorToDefault()
 		else:
-			setColor(255, 0, 0, 0, 'pulse')
+			TrackballController.setColor(255, 0, 0, 0, 'pulse')
 		buttonDictionary.update({'switchMode': 0})
 
 
@@ -83,7 +83,7 @@ class TrackballController():
 	# === Trackball/Button Event Handler ======================================
 
 	def handleButtonChanges(buttonDictionary):
-		movementThreshold = 4
+		movementThreshold = 5
 		minMode = 0
 		maxMode = 9
 			
@@ -246,8 +246,3 @@ class TrackballController():
 	def watch(running, statusDictionary, buttonDictionary):
 		while running == True:
 			TrackballController.handleButtonChanges(buttonDictionary)
-
-
-
-	
-	
