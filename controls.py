@@ -243,8 +243,8 @@ class TrackballController():
 
 	# === Trackball/Button Event Handler Init =================================
 
-	def watch(buttonDictionary):
-		while True:
+	def watch(running, statusDictionary, buttonDictionary):
+		while running == True:
 			handleButtonChanges(buttonDictionary)
 
 
