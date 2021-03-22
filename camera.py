@@ -313,7 +313,7 @@ def createControls():
 	
 # -------------------------------------------------------------------------------
 def darkMode():
-	Lights.off()
+	Light.off()
 	TrackballController.off()
 
 
