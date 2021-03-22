@@ -40,7 +40,7 @@ class TrackballController():
 		if mode == 'flash':
 			trackball.set_rgbw(r, g, b, w)
 			time.sleep(0.2)
-			setColorToDefault()
+			TrackballController.setColorToDefault()
 		elif mode == 'pulse':
 			trackball.set_rgbw(r, g, b, w)
 			#TODO: Make pulse -- threaded?
@@ -62,21 +62,21 @@ class TrackballController():
 	def setSwitchModeColor():
 		currentMode = buttonDictionary['switchMode']
 		if currentMode == 2:
-			setColor( 60, 30, 0, 0, 'static')
+			TrackballController.setColor( 60, 30, 0, 0, 'static')
 		elif currentMode == 3:
-			setColor( 30, 30, 0, 0, 'static')
+			TrackballController.setColor( 30, 30, 0, 0, 'static')
 		elif currentMode == 4:
-			setColor( 0, 30, 30, 0, 'static')
+			TrackballController.setColor( 0, 30, 30, 0, 'static')
 		elif currentMode == 5:
-			setColor( 30, 0, 30, 0, 'static')
+			TrackballController.setColor( 30, 0, 30, 0, 'static')
 		elif currentMode == 6:
-			setColor( 30, 0, 0, 0, 'static')
+			TrackballController.setColor( 30, 0, 0, 0, 'static')
 		elif currentMode == 7:
-			setColor( 0, 30, 0, 0, 'static')
+			TrackballController.setColor( 0, 30, 0, 0, 'static')
 		elif currentMode == 8:
-			setColor( 0, 0, 30, 0, 'static')
+			TrackballController.setColor( 0, 0, 30, 0, 'static')
 		elif currentMode == 9:
-			setColor( 0, 0, 0, 30, 'static')
+			TrackballController.setColor( 0, 0, 0, 30, 'static')
 
 
 
@@ -93,10 +93,10 @@ class TrackballController():
 		if buttonDictionary['switchMode'] == 0:
 			if int(click) == 1:
 				buttonDictionary.update({'capture': True})
-				setColor(0, 255, 255, 64, 'flash')
+				TrackballController.setColor(0, 255, 255, 64, 'flash')
 			else: 
 				buttonDictionary.update({'capture': False})
-				setColorToDefault()
+				TrackballController.setColorToDefault()
 
 		# Capture Video Mode
 		elif buttonDictionary['switchMode'] == 1:
@@ -104,11 +104,11 @@ class TrackballController():
 				if buttonDictionary['isRecording'] == False:
 					buttonDictionary.update({'captureVideo': True})
 					buttonDictionary.update({'isRecording': True})
-					setColor(255, 0, 0, 0, 'pulse')
+					TrackballController.setColor(255, 0, 0, 0, 'pulse')
 				else: 
 					buttonDictionary.update({'captureVideo': False})
 					buttonDictionary.update({'isRecording': False}) 
-					setColorToDefault()
+					TrackballController.setColorToDefault()
 
 		# Set Shutter Mode
 		elif buttonDictionary['switchMode'] == 2:
@@ -117,7 +117,7 @@ class TrackballController():
 			elif int(down) > movementThreshold:
 				buttonDictionary.update({'shutterDown': True})
 			elif int(click) == 1:
-				setSwitchModeToDefault()
+				TrackballController.setSwitchModeToDefault()
 
 		# Set ISO Mode
 		elif buttonDictionary['switchMode'] == 3:
@@ -135,7 +135,7 @@ class TrackballController():
 			elif int(down) > movementThreshold:
 				buttonDictionary.update({'evDown': True})
 			elif int(click) == 1:
-				setSwitchModeToDefault()
+				TrackballController.setSwitchModeToDefault()
 
 		# Set Bracketing Mode
 		elif buttonDictionary['switchMode'] == 5:
@@ -144,7 +144,7 @@ class TrackballController():
 			elif int(down) > movementThreshold:
 				buttonDictionary.update({'bracketDown': True})
 			elif int(click) == 1:
-				setSwitchModeToDefault()
+				TrackballController.setSwitchModeToDefault()
 
 		# Set Light's (R)ed Mode
 		elif buttonDictionary['switchMode'] == 6:
@@ -154,15 +154,15 @@ class TrackballController():
 					buttonDictionary.update({'lightR': currentLevel + 1})
 				else: 
 					buttonDictionary.update({'lightR': 0})
-				updateLight()
+				Light.updateLight()
 			elif int(down) > movementThreshold:
 				if currentLevel > 0:
 					buttonDictionary.update({'lightR': currentLevel - 1})
 				else: 
 					buttonDictionary.update({'lightR': 255})
-				updateLight()
+				Light.updateLight()
 			elif int(click) == 1:
-				setSwitchModeToDefault()
+				TrackballController.setSwitchModeToDefault()
 
 		# Set Light's (G)reen Mode
 		elif buttonDictionary['switchMode'] == 7:
@@ -172,15 +172,15 @@ class TrackballController():
 					buttonDictionary.update({'lightG': currentLevel + 1})
 				else: 
 					buttonDictionary.update({'lightG': 0})
-				updateLight()
+				Light.updateLight()
 			elif int(down) > movementThreshold:
 				if currentLevel > 0:
 					buttonDictionary.update({'lightG': currentLevel - 1})
 				else: 
 					buttonDictionary.update({'lightG': 255})
-				updateLight()
+				Light.updateLight()
 			elif int(click) == 1:
-				setSwitchModeToDefault()
+				TrackballController.setSwitchModeToDefault()
 
 		# Set Light's (B)lue Mode
 		elif buttonDictionary['switchMode'] == 8:
@@ -190,15 +190,15 @@ class TrackballController():
 					buttonDictionary.update({'lightB': currentLevel + 1})
 				else: 
 					buttonDictionary.update({'lightB': 0})
-				updateLight()
+				Light.updateLight()
 			elif int(down) > movementThreshold:
 				if currentLevel > 0:
 					buttonDictionary.update({'lightB': currentLevel - 1})
 				else: 
 					buttonDictionary.update({'lightB': 255})
-				updateLight()
+				Light.updateLight()
 			elif int(click) == 1:
-				setSwitchModeToDefault()
+				TrackballController.setSwitchModeToDefault()
 
 		# Set Light's (W)hite Mode
 		elif buttonDictionary['switchMode'] == 9:
@@ -208,15 +208,15 @@ class TrackballController():
 					buttonDictionary.update({'lightW': currentLevel + 1})
 				else: 
 					buttonDictionary.update({'lightW': 0})
-				updateLight()
+				Light.updateLight()
 			elif int(down) > movementThreshold:
 				if currentLevel > 0:
 					buttonDictionary.update({'lightW': currentLevel - 1})
 				else: 
 					buttonDictionary.update({'lightW': 255})
-				updateLight()
+				Light.updateLight()
 			elif int(click) == 1:
-				setSwitchModeToDefault()
+				TrackballController.setSwitchModeToDefault()
 
 		# Left Mode Scrolling
 		elif int(left) > movementThreshold:
@@ -225,7 +225,7 @@ class TrackballController():
 				buttonDictionary.update({'switchMode': currentMode - 1})
 			else:
 				buttonDictionary.update({'switchMode': maxMode})
-			setSwitchModeColor()
+			TrackballController.setSwitchModeColor()
 		
 		# Right Mode Scrolling
 		elif int(right) > movementThreshold:
@@ -234,7 +234,7 @@ class TrackballController():
 				buttonDictionary.update({'switchMode': currentMode + 1})
 			else:
 				buttonDictionary.update({'switchMode': minMode})
-			setSwitchModeColor()
+			TrackballController.setSwitchModeColor()
 
 
 		time.sleep(0.2)
