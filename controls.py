@@ -226,6 +226,7 @@ class TrackballController():
 			else:
 				buttonDictionary.update({'switchMode': maxMode})
 			TrackballController.setSwitchModeColor(buttonDictionary)
+			time.sleep(0.75)
 		
 		# Right Mode Scrolling
 		elif int(right) > movementThreshold:
@@ -235,9 +236,10 @@ class TrackballController():
 			else:
 				buttonDictionary.update({'switchMode': minMode})
 			TrackballController.setSwitchModeColor(buttonDictionary)
+			time.sleep(0.75)
 
 
-		time.sleep(0.2)
+		time.sleep(0.25)
 		return buttonDictionary
 
 
