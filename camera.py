@@ -532,17 +532,14 @@ try:
 		# Not yet implemented
 
 	# print(' Action: ' + action)
-	if action == 'capture' or action == 'image' or action == 'photo':
-		Capture()
-	elif action == 'capturesingle' or action == 'single':
+	if action == 'capturesingle' or action == 'single':
 		Capture('single')
 	elif action == 'timelapse':
 		Capture('timelapse')
 	elif action == 'video':
 		Capture('video')
 	else:
-		echoOn()
-		sys.exit(0)
+		Capture()
 
 except KeyboardInterrupt:
 	darkMode()
