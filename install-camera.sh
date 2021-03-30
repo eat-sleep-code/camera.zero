@@ -24,11 +24,12 @@ sudo rm -Rf PyDNG
 echo ''
 echo -e '\033[93mInstalling Camera Zero... \033[0m'
 cd ~
-sudo rm -Rf ~/camera
+sudo rm -Rf ~/camera.zero
 sudo git clone https://github.com/eat-sleep-code/camera.zero
-sudo chown -R $USER:$USER camera
-cd camera
+sudo chown -R $USER:$USER camera.zero
+cd camera.zero
 sudo chmod +x camera.py
+sudo chmod +x stream.py
 
 echo ''
 echo -e '\033[93mDownloading color profiles... \033[0m'
