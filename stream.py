@@ -19,7 +19,7 @@ PAGE="""\
 </head>
 <body style="margin: 0; padding: 0;">
 	<div style="background: rgba(8, 8, 8, 1.0); display: flex; align-items: center; width: 100vw; justify-content: center; height: 100vh;">
-		<img src="stream.mjpg" style="width: 100%; max-width: 640px;" />
+		<img src="stream.mjpg" style="width: 100%; max-width: 960px;" />
 	</div>
 </body>
 </html>
@@ -85,7 +85,7 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
 	allow_reuse_address = True
 	daemon_threads = True
 
-with picamera.PiCamera(resolution='640x480', framerate=24) as camera:
+with picamera.PiCamera(resolution='960x540', framerate=24) as camera:
 	output = StreamingOutput()
 	camera.start_recording(output, format='mjpeg')
 	hostname = subprocess.getoutput('hostname -I')
