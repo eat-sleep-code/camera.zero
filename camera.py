@@ -12,7 +12,7 @@ import threading
 import time
 
 
-version = '2021.02.26'
+version = '2021.03.21'
 
 camera = PiCamera()
 PiCamera.CAPTURE_TIMEOUT = 1500
@@ -313,7 +313,7 @@ def createControls():
 	
 # -------------------------------------------------------------------------------
 def darkMode():
-	Lights.off()
+	Light.off()
 	TrackballController.off()
 
 
@@ -378,14 +378,9 @@ try:
 		
 		while True:
 			try:
-				if buttonDictionary['exit'] == True:
-					# clear()
-					echoOn()
-					sys.exit(1)
-					break
 					
 				# Capture
-				elif buttonDictionary['capture'] == True:
+				if buttonDictionary['capture'] == True:
 					
 					if mode == 'persistent':
 						# Normal photo
@@ -532,17 +527,14 @@ try:
 		# Not yet implemented
 
 	# print(' Action: ' + action)
-	if action == 'capture' or action == 'image' or action == 'photo':
-		Capture()
-	elif action == 'capturesingle' or action == 'single':
+	if action == 'capturesingle' or action == 'single':
 		Capture('single')
 	elif action == 'timelapse':
 		Capture('timelapse')
 	elif action == 'video':
 		Capture('video')
 	else:
-		echoOn()
-		sys.exit(0)
+		Capture()
 
 except KeyboardInterrupt:
 	darkMode()
