@@ -1,6 +1,7 @@
 import io
 import picamera
 import logging
+import socket
 import socketserver
 from threading import Condition
 from http import server
@@ -88,5 +89,8 @@ with picamera.PiCamera(resolution='640x480', framerate=24) as camera:
         address = ('', 80)
         server = StreamingServer(address, StreamingHandler)
         server.serve_forever()
+        hostname = socket.gethostbyname(socket.gethostname())
+        print('Stream started: http://' + str(hostname))
     finally:
         camera.stop_recording()
+        print('Stream ended')
