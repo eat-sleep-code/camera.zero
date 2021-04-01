@@ -31,6 +31,11 @@ camera.zero
 
 ---
 
+## Web Controls
+If you need to control your camera via a web-based interface, please see [camera.remote](https://github.com/eat-sleep-code/camera.remote).
+
+---
+
 ## Infrared Cameras
 If you are using an infrared (IR) camera, you will need to modify the Auto White Balance (AWB) mode at boot time.
 
