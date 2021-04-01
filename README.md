@@ -29,9 +29,7 @@ sudo chmod +x ~/install-camera.sh && ~/install-camera.sh
 camera.zero
 ```
 
----
-
-## Web Controls
+### Web Controls
 If you need to control your camera via a web-based interface, please see [camera.remote](https://github.com/eat-sleep-code/camera.remote).
 
 ---
