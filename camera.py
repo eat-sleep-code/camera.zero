@@ -12,7 +12,14 @@ import threading
 import time
 
 
-version = '2021.03.21'
+version = '2021.03.31'
+
+# Kill other camera script(s)
+try:
+	cameraRemoteScript = "/home/pi/camera.remote/camera.py"
+	subprocess.check_call(['pkill', '-9', '-f', cameraRemoteScript])
+except Exception as ex:
+	pass
 
 camera = PiCamera()
 PiCamera.CAPTURE_TIMEOUT = 1500
@@ -361,7 +368,7 @@ try:
 		# print(str(camera.resolution))
 		camera.sensor_mode = 3
 
-		print('\n Camera ' + version )
+		print('\n Camera Zero ' + version )
 		print('\n ----------------------------------------------------------------------')
 		time.sleep(2)
 
