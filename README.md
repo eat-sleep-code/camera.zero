@@ -29,6 +29,21 @@ sudo chmod +x ~/install-camera.sh && ~/install-camera.sh
 camera.zero
 ```
 
+### Trackball Controls
+- Scroll left and right to change setting selection:
+     - Capture Photo
+     - Capture Video
+     - Shutter Speed
+     - ISO Setting
+     - Exposure Compensation
+     - Bracketing
+     - Scene Light: Red Light Level
+     - Scene Light: Green Light Level
+     - Scene Light: Blue Light Level
+     - Scene Light Natural White Level
+- Scroll up and down to change the values of the current setting
+- Press the trackball to trigger the shutter
+
 ### Web Controls
 If you need to control your camera via a web-based interface, please see [camera.remote](https://github.com/eat-sleep-code/camera.remote).
 
