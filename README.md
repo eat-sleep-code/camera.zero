@@ -6,7 +6,7 @@ Combining this program with a Raspberry Pi HQ camera, a Raspberry Pi Zero WH, a 
 ## Getting Started
 
 - Use [raspi-config](https://www.raspberrypi.org/documentation/configuration/raspi-config.md) to:
-  - Set the Memory Split value to a value of at least 256MB
+  - Set the Memory Split value to a value of at least 192MB
   - Enable the CSI camera interface
   - Enable the I2C interface
   - Set up your WiFi connection
