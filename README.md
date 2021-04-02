@@ -31,6 +31,14 @@ camera.zero
 
 ---
 
+## Autostart Camera Zero
+Want to start the program every time you boot your Raspberry Pi?  Here is how!
+
+* Review `/etc/systemd/system/camera.zero.service`
+* Run `~/camera.zero/install-camera.zero.service.sh`
+
+---
+
 ## Infrared Cameras
 If you are using an infrared (IR) camera, you will need to modify the Auto White Balance (AWB) mode at boot time.
 

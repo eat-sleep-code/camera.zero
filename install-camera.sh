@@ -41,6 +41,13 @@ wget -q https://github.com/davidplowman/Colour_Profiles/raw/master/imx477/PyDNG_
 wget -q https://github.com/davidplowman/Colour_Profiles/raw/master/imx477/Raspberry%20Pi%20High%20Quality%20Camera%20Lumariver%202860k-5960k%20Neutral%20Look.dcp -O ~/camera.zero/profiles/neutral.dcp
 wget -q https://github.com/davidplowman/Colour_Profiles/raw/master/imx477/Raspberry%20Pi%20High%20Quality%20Camera%20Lumariver%202860k-5960k%20Skin%2BSky%20Look.dcp -O ~/camera.zero/profiles/skin-and-sky.dcp
 
+echo ''
+echo -e '\033[93mCreating Service... \033[0m'
+sudo mv camera.zero.service /etc/systemd/system/camera.zero.service
+sudo chown root:root /etc/systemd/system/camera.zero.service
+sudo chmod +x *.sh 
+echo 'Please see the README file for more information on configuring the service.'
+
 cd ~
 echo ''
 echo -e '\033[93mSetting up alias... \033[0m'
