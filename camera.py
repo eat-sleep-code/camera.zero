@@ -56,7 +56,7 @@ outputFolder = 'dcim/'
 
 timer = 0
 
-raw = True
+raw = False
 
 
 
