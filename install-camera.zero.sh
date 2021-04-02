@@ -43,7 +43,7 @@ wget -q https://github.com/davidplowman/Colour_Profiles/raw/master/imx477/Raspbe
 
 echo ''
 echo -e '\033[93mCreating Service... \033[0m'
-sudo mv camera.zero.service /etc/systemd/system/camera.zero.service
+sudo mv ~/camera.zero/camera.zero.service /etc/systemd/system/camera.zero.service
 sudo chown root:root /etc/systemd/system/camera.zero.service
 sudo chmod +x *.sh 
 echo 'Please see the README file for more information on configuring the service.'
