@@ -18,8 +18,8 @@ Combining this program with a Raspberry Pi HQ camera, a Raspberry Pi Zero WH, a 
 Installation of the program, any software prerequisites, as well as DNG support can be completed with the following two-line install script.
 
 ```
-wget -q https://raw.githubusercontent.com/eat-sleep-code/camera.zero/master/install-camera.zero.sh -O ~/install-camera.zero.sh
-sudo chmod +x ~/install-camera.zero.sh && ~/install-camera.zero.sh
+wget -q https://raw.githubusercontent.com/eat-sleep-code/camera.zero/master/install-camera.sh -O ~/install-camera.sh
+sudo chmod +x ~/install-camera.sh && ~/install-camera.sh
 ```
 
 ---
@@ -49,12 +49,19 @@ If you need to control your camera via a web-based interface, please see [camera
 
 ---
 
-## Autostart Camera Zero
-Want to start the program every time you boot your Raspberry Pi?  Here is how!
+## Autostart at Desktop Login
 
-* Review `/etc/systemd/system/camera.zero.service`
-* Run `~/camera.zero/install-camera.zero.service.sh`
+To autostart the program as soon as the Raspberry Pi OS desktop starts, execute the following command:
 
+```
+sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
+```
+
+Add the following line to the end of the file and then save the file:
+
+```
+@lxterminal --geometry=1x1 -e sudo python3 /home/pi/camera.zero/camera.py
+```
 ---
 
 ## Infrared Cameras
