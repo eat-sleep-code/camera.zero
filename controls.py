@@ -34,7 +34,7 @@ class TrackballController():
 		trackball.set_rgbw(0, 0, 0, 0)
 
 	def setColorToDefault():
-		trackball.set_rgbw(0, 0, 0, 64)
+		trackball.set_rgbw(0, 0, 0, 128)
 
 	def setColor(r, g, b, w, mode):
 		if mode == 'flash':
@@ -62,22 +62,23 @@ class TrackballController():
 	def setSwitchModeColor(buttonDictionary):
 		currentMode = buttonDictionary['switchMode']
 		if currentMode == 2:
-			TrackballController.setColor( 60, 30, 0, 0, 'static')
+			TrackballController.setColor( 128, 64, 0, 0, 'static')
 		elif currentMode == 3:
-			TrackballController.setColor( 30, 30, 0, 0, 'static')
+			TrackballController.setColor( 64, 64, 0, 0, 'static')
 		elif currentMode == 4:
-			TrackballController.setColor( 0, 30, 30, 0, 'static')
+			TrackballController.setColor( 0, 64, 64, 0, 'static')
 		elif currentMode == 5:
-			TrackballController.setColor( 30, 0, 30, 0, 'static')
+			TrackballController.setColor( 64, 0, 64, 0, 'static')
 		elif currentMode == 6:
-			TrackballController.setColor( 30, 0, 0, 0, 'static')
+			TrackballController.setColor( 64, 0, 0, 0, 'static')
 		elif currentMode == 7:
-			TrackballController.setColor( 0, 30, 0, 0, 'static')
+			TrackballController.setColor( 0, 64, 0, 0, 'static')
 		elif currentMode == 8:
-			TrackballController.setColor( 0, 0, 30, 0, 'static')
+			TrackballController.setColor( 0, 0, 64, 0, 'static')
 		elif currentMode == 9:
-			TrackballController.setColor( 0, 0, 0, 30, 'static')
-
+			TrackballController.setColor( 0, 0, 0, 64, 'static')
+		elif currentMode == 9:
+			TrackballController.setColor( 8, 8, 8, 8, 'static')
 
 
 	# === Trackball/Button Event Handler ======================================
@@ -217,6 +218,24 @@ class TrackballController():
 				Light.updateLight(buttonDictionary)
 			elif int(click) == 1:
 				TrackballController.setSwitchModeToDefault(buttonDictionary)
+
+		# Set Light's (W)hite Mode
+		elif buttonDictionary['switchMode'] == 10:
+			if int(click) == 1:
+				startTime = time.time()
+
+				while int(click) == 0:
+					pass
+
+				buttonHoldTime = time.time() - startTime
+
+				if buttonHoldTime >= 5 and buttonHoldTime < 10:
+					buttonDictionary.update({'remote': True})
+				elif buttonHoldTime >= 10:
+					buttonDictionary.update({'exit': True})	
+				else: 
+					TrackballController.setSwitchModeToDefault(buttonDictionary)
+
 
 		# Left Mode Scrolling
 		if int(left) > movementThreshold:

@@ -21,7 +21,7 @@ dng = RPICAM2DNG()
 running = False
 buttons = TrackballController()
 statusDictionary = {'message': '', 'action': '', 'colorR': 0, 'colorG': 0, 'colorB': 0, 'colorW': 0}
-buttonDictionary = {'switchMode': 0, 'shutterUp': False, 'shutterDown': False, 'isoUp': False, 'isoDown': False, 'evUp': False, 'evDown': False, 'bracketUp': False, 'bracketDown': False, 'capture': False, 'captureVideo': False, 'isRecording': False, 'lightR': 0, 'lightB': 0, 'lightG': 0, 'lightW': 0}
+buttonDictionary = {'switchMode': 0, 'shutterUp': False, 'shutterDown': False, 'isoUp': False, 'isoDown': False, 'evUp': False, 'evDown': False, 'bracketUp': False, 'bracketDown': False, 'capture': False, 'captureVideo': False, 'isRecording': False, 'lightR': 0, 'lightB': 0, 'lightG': 0, 'lightW': 0, 'exit': False, 'remote': False}
 
 
 previewVisible = False
@@ -517,6 +517,19 @@ try:
 						bracket = int(bracket - 1)
 						setBracket(bracket, 0.25)
 						buttonDictionary.update({'bracketDown': False})
+
+				# Exit / Spawn
+				elif buttonDictionary['exit'] == True || elif buttonDictionary['remote'] == True:
+					running = False
+					hidePreview()
+					camera.close()
+					if buttonDictionary['remote'] == True:
+						try:
+							subprocess.Popen(['sudo', 'python3', '/home/pi/camera.remote/camera.py'])	
+						except:
+							print(' Could not launch remote control. ')
+					sys.exit(0)
+
 			except SystemExit:
 				running = False
 				hidePreview()
