@@ -519,7 +519,7 @@ try:
 						buttonDictionary.update({'bracketDown': False})
 
 				# Exit / Spawn
-				elif buttonDictionary['exit'] == True || elif buttonDictionary['remote'] == True:
+				elif buttonDictionary['exit'] == True or elif buttonDictionary['remote'] == True:
 					running = False
 					hidePreview()
 					camera.close()
