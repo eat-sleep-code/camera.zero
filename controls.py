@@ -34,7 +34,7 @@ class TrackballController():
 		trackball.set_rgbw(0, 0, 0, 0)
 
 	def setColorToDefault():
-		trackball.set_rgbw(0, 0, 0, 128)
+		trackball.set_rgbw(128, 128, 128, 128)
 
 	def setColor(r, g, b, w, mode):
 		if mode == 'flash':
@@ -86,7 +86,7 @@ class TrackballController():
 	def handleButtonChanges(buttonDictionary):
 		movementThreshold = 5
 		minMode = 0
-		maxMode = 9
+		maxMode = 10
 			
 		left, right, down, up, click, state = trackball.read()  # Change the order of these if your inputs are incorrect
 		
@@ -94,7 +94,7 @@ class TrackballController():
 		if buttonDictionary['switchMode'] == 0:
 			if int(click) == 1:
 				buttonDictionary.update({'capture': True})
-				TrackballController.setColor(0, 255, 255, 64, 'flash')
+				TrackballController.setColor(0, 255, 255, 128, 'flash')
 			else: 
 				buttonDictionary.update({'capture': False})
 				TrackballController.setColorToDefault()
