@@ -297,6 +297,7 @@ def captureImage(filepath, raw = True):
 	camera.capture(filepath, quality=100, bayer=raw)
 	if raw == True:
 		conversionThread = threading.Thread(target=convertBayerDataToDNG, args=(filepath,))
+		conversionThread.daemon = True
 		conversionThread.start()
 
 # ------------------------------------------------------------------------------		
@@ -323,6 +324,7 @@ def darkMode():
 # === Image Capture ============================================================
 
 controlsThread = threading.Thread(target=createControls)
+controlsThread.daemon = True
 controlsThread.start()
 
 
