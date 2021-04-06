@@ -61,6 +61,8 @@ class TrackballController():
 
 	def setSwitchModeColor(buttonDictionary):
 		currentMode = buttonDictionary['switchMode']
+		if currentMode == 1:
+			TrackballController.setColor( 128, 0, 0, 0, 'static')
 		if currentMode == 2:
 			TrackballController.setColor( 128, 64, 0, 0, 'static')
 		elif currentMode == 3:
@@ -78,7 +80,9 @@ class TrackballController():
 		elif currentMode == 9:
 			TrackballController.setColor( 0, 0, 0, 64, 'static')
 		elif currentMode == 10:
-			TrackballController.setColor( 8, 8, 8, 8, 'static')
+			TrackballController.setColor( 101, 67, 33, 0, 'static')
+		else:
+			TrackballController.setColorToDefault()
 
 
 	# === Trackball/Button Event Handler ======================================
@@ -239,7 +243,7 @@ class TrackballController():
 					pass
 
 				buttonHoldTime = time.time() - startTime
-				print(' Button Held For: ' + str(buttonHoldTime))
+				#print(' Button Held For: ' + str(buttonHoldTime))
 				if buttonHoldTime >= 5 and buttonHoldTime < 10:
 					buttonDictionary.update({'remote': True})
 				elif buttonHoldTime >= 10:

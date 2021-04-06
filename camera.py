@@ -27,8 +27,6 @@ buttonDictionary = {'switchMode': 0, 'shutterUp': False, 'shutterDown': False, '
 previewVisible = False
 previewWidth = 800
 previewHeight = 460
-	
-action = 'capture'
 
 shutter = 'auto'
 shutterLong = 30000
@@ -394,7 +392,7 @@ try:
 					if buttonDictionary['remote'] == True:
 						try:
 							subprocess.Popen(['sudo', 'python3', '/home/pi/camera.remote/camera.py'])	
-						except:
+						except Exception as ex:
 							print(' Could not launch remote control. ')
 					sys.exit(0)
 					
@@ -537,19 +535,6 @@ try:
 				print(str(ex))
 				pass
 
-	def CaptureAndUploadImage():
-		Capture()
-		time.sleep(1000)
-		# Not yet implemented
-
-	# print(' Action: ' + action)
-	if action == 'capturesingle' or action == 'single':
-		Capture('single')
-	elif action == 'timelapse':
-		Capture('timelapse')
-	elif action == 'video':
-		Capture('video')
-	else:
 		Capture()
 
 except KeyboardInterrupt:
