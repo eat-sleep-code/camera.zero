@@ -383,9 +383,23 @@ try:
 		
 		while True:
 			try:
+				# Exit / Spawn
+				if buttonDictionary['exit'] == True or buttonDictionary['remote'] == True:
+					running = False
+					darkMode()
+					echoOn()
+					camera.close()
+					time.sleep(1.0)
+					
+					if buttonDictionary['remote'] == True:
+						try:
+							subprocess.Popen(['sudo', 'python3', '/home/pi/camera.remote/camera.py'])	
+						except:
+							print(' Could not launch remote control. ')
+					sys.exit(0)
 					
 				# Capture
-				if buttonDictionary['capture'] == True:
+				elif buttonDictionary['capture'] == True:
 					
 					if mode == 'persistent':
 						# Normal photo
@@ -518,24 +532,7 @@ try:
 						setBracket(bracket, 0.25)
 						buttonDictionary.update({'bracketDown': False})
 
-				# Exit / Spawn
-				elif buttonDictionary['exit'] == True or buttonDictionary['remote'] == True:
-					running = False
-					hidePreview()
-					camera.close()
-					if buttonDictionary['remote'] == True:
-						try:
-							subprocess.Popen(['sudo', 'python3', '/home/pi/camera.remote/camera.py'])	
-						except:
-							print(' Could not launch remote control. ')
-					sys.exit(0)
-
-			except SystemExit:
-				running = False
-				hidePreview()
-				time.sleep(5)				
-				os.kill(os.getpid(), signal.SIGSTOP)
-				sys.exit(0)
+				
 			except Exception as ex:
 				print(str(ex))
 				pass
@@ -558,4 +555,4 @@ try:
 except KeyboardInterrupt:
 	darkMode()
 	echoOn()
-	sys.exit(1)
+	sys.exit(0)

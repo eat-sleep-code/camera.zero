@@ -77,7 +77,7 @@ class TrackballController():
 			TrackballController.setColor( 0, 0, 64, 0, 'static')
 		elif currentMode == 9:
 			TrackballController.setColor( 0, 0, 0, 64, 'static')
-		elif currentMode == 9:
+		elif currentMode == 10:
 			TrackballController.setColor( 8, 8, 8, 8, 'static')
 
 
@@ -92,7 +92,7 @@ class TrackballController():
 		
 		# Capture Mode
 		if buttonDictionary['switchMode'] == 0:
-			print(' Mode: Capture Photo ')
+			#print(' Mode: Capture Photo ')
 			if int(click) == 1:
 				buttonDictionary.update({'capture': True})
 				TrackballController.setColor(0, 255, 255, 128, 'flash')
@@ -102,7 +102,7 @@ class TrackballController():
 
 		# Capture Video Mode
 		elif buttonDictionary['switchMode'] == 1:
-			print(' Mode: Capture Video ')
+			#print(' Mode: Capture Video ')
 			if int(click) == 1:
 				if buttonDictionary['isRecording'] == False:
 					buttonDictionary.update({'captureVideo': True})
@@ -115,7 +115,7 @@ class TrackballController():
 
 		# Set Shutter Mode
 		elif buttonDictionary['switchMode'] == 2:
-			print(' Mode: Shutter Speed Control ')
+			#print(' Mode: Shutter Speed Control ')
 			if int(up) > movementThreshold:
 				buttonDictionary.update({'shutterUp': True})
 			elif int(down) > movementThreshold:
@@ -125,7 +125,7 @@ class TrackballController():
 
 		# Set ISO Mode
 		elif buttonDictionary['switchMode'] == 3:
-			print(' Mode: ISO Control ')
+			#print(' Mode: ISO Control ')
 			if int(up) > movementThreshold:
 				buttonDictionary.update({'isoUp': True})
 			elif int(down) > movementThreshold:
@@ -135,7 +135,7 @@ class TrackballController():
 
 		# Set Exposure Compensation Mode
 		elif buttonDictionary['switchMode'] == 4:
-			print(' Mode: Exposure Compensation Control ')
+			#print(' Mode: Exposure Compensation Control ')
 			if int(up) > movementThreshold:
 				buttonDictionary.update({'evUp': True})
 			elif int(down) > movementThreshold:
@@ -145,7 +145,7 @@ class TrackballController():
 
 		# Set Bracketing Mode
 		elif buttonDictionary['switchMode'] == 5:
-			print(' Mode: Bracketing Control ')
+			#print(' Mode: Bracketing Control ')
 			if int(up) > movementThreshold:
 				buttonDictionary.update({'bracketUp': True})
 			elif int(down) > movementThreshold:
@@ -155,7 +155,7 @@ class TrackballController():
 
 		# Set Light's (R)ed Mode
 		elif buttonDictionary['switchMode'] == 6:
-			print(' Mode: Red Scene Lighting Control ')
+			#print(' Mode: Red Scene Lighting Control ')
 			currentLevel = buttonDictionary['lightR']
 			if int(up) > movementThreshold:
 				if currentLevel < 255:
@@ -174,7 +174,7 @@ class TrackballController():
 
 		# Set Light's (G)reen Mode
 		elif buttonDictionary['switchMode'] == 7:
-			print(' Mode: Green Scene Lighting Control ')
+			#print(' Mode: Green Scene Lighting Control ')
 			currentLevel = buttonDictionary['lightG']
 			if int(up) > movementThreshold:
 				if currentLevel < 255:
@@ -193,7 +193,7 @@ class TrackballController():
 
 		# Set Light's (B)lue Mode
 		elif buttonDictionary['switchMode'] == 8:
-			print(' Mode: Blue Scene Lighting Control ')
+			#print(' Mode: Blue Scene Lighting Control ')
 			currentLevel = buttonDictionary['lightB']
 			if int(up) > movementThreshold:
 				if currentLevel < 255:
@@ -212,7 +212,7 @@ class TrackballController():
 
 		# Set Light's (W)hite Mode
 		elif buttonDictionary['switchMode'] == 9:
-			print(' Mode: Natural White Scene Lighting Control ')
+			#print(' Mode: Natural White Scene Lighting Control ')
 			currentLevel = buttonDictionary['lightW']
 			if int(up) > movementThreshold:
 				if currentLevel < 255:
@@ -231,9 +231,8 @@ class TrackballController():
 
 		# Exit / Launch Remote
 		elif buttonDictionary['switchMode'] == 10:
-			print(' Mode: Exit / Launch Remote ')
+			#print(' Mode: Exit / Launch Remote ')
 			if int(click) == 1:
-				print(' Trackball Read' + str(trackball.read()[4]);
 				startTime = time.time()
 
 				while trackball.read()[4] == 0:
