@@ -389,17 +389,18 @@ try:
 					darkMode()
 					echoOn()
 					camera.close()
+					try:
+						subprocess.Popen(['sudo', 'svc', '-d', '/etc/service/camera.zero'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+					except Exception as ex:
+						pass
 					time.sleep(1.0)
 					
 					if buttonDictionary['remote'] == True:
 						try:
-							subprocess.Popen(['sudo', 'python3', '/home/pi/camera.remote/camera.py'])	
+							subprocess.Popen(['sudo', 'python3', '/home/pi/camera.remote/camera.py'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)	
 						except Exception as ex:
 							print(' Could not launch remote control. ')
-					try:
-						subprocess.Popen('sudo', 'svc', '-d', '/etc/service/camera.zero')
-					except Exception as ex:
-						pass
+					
 					sys.exit(0)
 					
 				# Capture
