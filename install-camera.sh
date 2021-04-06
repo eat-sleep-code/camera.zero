@@ -48,7 +48,7 @@ sudo rm -Rf /etc/service/camera.zero
 sudo mkdir /etc/service/camera.zero
 sudo mv ~/camera.zero/run.disabled /etc/service/camera.zero/run
 sudo chmod +x /etc/service/camera.zero/run
-
+sudo chown -R root:root /etc/service/camera.zero
 cd ~
 echo ''
 echo -e '\033[93mSetting up alias... \033[0m'
