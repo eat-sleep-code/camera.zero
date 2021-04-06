@@ -1,0 +1,2 @@
+#!/bin/bash
+exec sudo /usr/bin/python3 /home/pi/camera.zero/camera.py

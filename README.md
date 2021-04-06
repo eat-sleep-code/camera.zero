@@ -49,19 +49,14 @@ If you need to control your camera via a web-based interface, please see [camera
 
 ---
 
-## Autostart at Desktop Login
+## Disabling Autostart
 
-To autostart the program as soon as the Raspberry Pi OS desktop starts, execute the following command:
-
-```
-sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
-```
-
-Add the following line to the end of the file and then save the file:
+To disable autostart of the program, execute the following command:
 
 ```
-@lxterminal --geometry=1x1 -e sudo python3 /home/pi/camera.zero/camera.py
+sudo mv /etc/service/camera.zero/run /etc/service/camera.zero/run.disabled
 ```
+
 ---
 
 ## Infrared Cameras

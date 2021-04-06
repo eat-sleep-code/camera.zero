@@ -9,7 +9,7 @@ sudo apt update
 
 echo ''
 echo -e '\033[93mInstalling prerequisites... \033[0m'
-sudo apt install -y git python3 python3-pip python3-picamera
+sudo apt install -y git python3 python3-pip python3-picamera daemontools daemontools-run
 sudo pip3 install RPi.GPIO trackball adafruit-circuitpython-neopixel
 
 echo ''
@@ -39,6 +39,15 @@ sudo chown -R $USER:$USER ~/camera.zero/profiles
 wget -q https://github.com/davidplowman/Colour_Profiles/raw/master/imx477/PyDNG_profile.dcp -O ~/camera.zero/profiles/basic.dcp
 wget -q https://github.com/davidplowman/Colour_Profiles/raw/master/imx477/Raspberry%20Pi%20High%20Quality%20Camera%20Lumariver%202860k-5960k%20Neutral%20Look.dcp -O ~/camera.zero/profiles/neutral.dcp
 wget -q https://github.com/davidplowman/Colour_Profiles/raw/master/imx477/Raspberry%20Pi%20High%20Quality%20Camera%20Lumariver%202860k-5960k%20Skin%2BSky%20Look.dcp -O ~/camera.zero/profiles/skin-and-sky.dcp
+
+echo ''
+echo -e '\033[093mSetting up autostart daemon... \033[0m'
+cd ~
+sudo svc -k camera.zero
+sudo rm -Rf /etc/service/camera.zero
+sudo mkdir /etc/service/camera.zero
+sudo mv ~/camera.zero/run.disabled /etc/service/camera.zero/run
+sudo chmod +x /etc/service/camera.zero/run
 
 cd ~
 echo ''

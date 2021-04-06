@@ -396,6 +396,7 @@ try:
 							subprocess.Popen(['sudo', 'python3', '/home/pi/camera.remote/camera.py'])	
 						except Exception as ex:
 							print(' Could not launch remote control. ')
+					subprocess.Popen('sudo', 'svc', '-k', 'camera.zero')
 					sys.exit(0)
 					
 				# Capture
