@@ -12,9 +12,8 @@ import threading
 import time
 
 
-version = '2021.04.05'
+version = '2021.04.06'
 
-os.environ['TERM'] = 'xterm-256color'
 camera = PiCamera()
 PiCamera.CAPTURE_TIMEOUT = 1500
 camera.resolution = camera.MAX_RESOLUTION
@@ -62,11 +61,11 @@ raw = False
 # === Echo Control =============================================================
 
 def echoOff():
-	subprocess.run(['stty', '-echo'], check=True)
+	subprocess.Popen(['stty', '-echo'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 def echoOn():
-	subprocess.run(['stty', 'echo'], check=True)
+	subprocess.Popen(['stty', 'echo'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 def clear():
-	subprocess.call('clear' if os.name == 'posix' else 'cls')
+	subprocess.Popen('clear' if os.name == 'posix' else 'cls')
 clear()
 
 
