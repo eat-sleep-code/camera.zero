@@ -14,6 +14,7 @@ import time
 
 version = '2021.04.05'
 
+os.environ['TERM'] = 'xterm-256color'
 camera = PiCamera()
 PiCamera.CAPTURE_TIMEOUT = 1500
 camera.resolution = camera.MAX_RESOLUTION
