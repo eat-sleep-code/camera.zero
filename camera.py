@@ -397,7 +397,7 @@ try:
 						except Exception as ex:
 							print(' Could not launch remote control. ')
 					try:
-						subprocess.Popen('sudo', 'svc', '-k', 'camera.zero')
+						subprocess.Popen('sudo', 'svc', '-d', '/etc/service/camera.zero')
 					except Exception as ex:
 						pass
 					sys.exit(0)

@@ -43,7 +43,7 @@ wget -q https://github.com/davidplowman/Colour_Profiles/raw/master/imx477/Raspbe
 echo ''
 echo -e '\033[093mSetting up autostart daemon... \033[0m'
 cd ~
-sudo svc -k camera.zero
+sudo svc -d /etc/service/camera.zero
 sudo rm -Rf /etc/service/camera.zero
 sudo mkdir /etc/service/camera.zero
 sudo mv ~/camera.zero/run.disabled /etc/service/camera.zero/run
