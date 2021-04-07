@@ -42,7 +42,7 @@ camera.zero
      - Scene Light: Blue Light Level
      - Scene Light Natural White Level
      - Exit
-        - Press for 5 - 9 seconds to exit the program and launch [Camera Remote](https://github.com/eat-sleep-code/camera.zero) (if installed)
+        - Press for 5 - 9 seconds to exit the program and launch [Camera Remote](https://github.com/eat-sleep-code/camera.remote) (if installed)
         - Press for 10+ seconds to exit the program 
 - Scroll up and down to change the values of the current setting
 - Press the trackball to trigger the shutter
