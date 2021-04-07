@@ -23,8 +23,8 @@ buttons = TrackballController()
 statusDictionary = {'message': '', 'action': '', 'colorR': 0, 'colorG': 0, 'colorB': 0, 'colorW': 0}
 buttonDictionary = {'switchMode': 0, 'shutterUp': False, 'shutterDown': False, 'isoUp': False, 'isoDown': False, 'evUp': False, 'evDown': False, 'bracketUp': False, 'bracketDown': False, 'capture': False, 'captureVideo': False, 'isRecording': False, 'lightR': 0, 'lightB': 0, 'lightG': 0, 'lightW': 0, 'exit': False, 'remote': False}
 
-outputLog = open('~/home/pi/camera.zero/logs/output.log', 'w+')
-errorLog = open('~/home/pi/camera.zero/logs/error.log', 'w+')
+outputLog = open('/home/pi/camera.zero/logs/output.log', 'w+')
+errorLog = open('/home/pi/camera.zero/logs/error.log', 'w+')
 
 previewVisible = False
 previewWidth = 800
@@ -62,6 +62,7 @@ raw = False
 
 # === Echo Control =============================================================
 
+os.environ['TERM'] = 'xterm-256color'
 def echoOff():
 	subprocess.Popen(['stty', '-echo'], shell=True, stdout=subprocess.DEVNULL, stderr=errorLog)
 def echoOn():
@@ -393,10 +394,10 @@ try:
 					camera.close()
 					try:
 						# Tell service to not auto restart after it is killed
-						subprocess.run('sudo svc -d /etc/service/camera.zero'], shell=True, stdout=outputLog, stderr=errorLog)
+						subprocess.run('sudo svc -d /etc/service/camera.zero', shell=True, stdout=outputLog, stderr=errorLog)
 						
 						# Kill the current running service
-						subprocess.run(['sudo svc -k /etc/service/camera.zero'], shell=True, stdout=outputLog, stderr=errorLog)
+						subprocess.run('sudo svc -k /etc/service/camera.zero', shell=True, stdout=outputLog, stderr=errorLog)
 						
 					except Exception as ex:
 						print(ex)

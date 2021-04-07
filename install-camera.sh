@@ -26,7 +26,7 @@ echo -e '\033[93mInstalling Camera Zero... \033[0m'
 cd ~
 sudo rm -Rf ~/camera.zero
 sudo git clone https://github.com/eat-sleep-code/camera.zero
-sudo mkdir -p ~/home/pi/camera.zero/logs
+sudo mkdir -p ~/camera.zero/logs
 sudo chown -R $USER:$USER camera.zero
 cd camera.zero
 sudo chmod +x camera.py
@@ -50,9 +50,10 @@ sudo mkdir /etc/service/camera.zero
 sudo mv ~/camera.zero/run.disabled /etc/service/camera.zero/run
 sudo chmod +x /etc/service/camera.zero/run
 sudo chown -R root:root /etc/service/camera.zero
-cd ~
+
 echo ''
 echo -e '\033[93mSetting up alias... \033[0m'
+cd ~
 sudo touch ~/.bash_aliases
 sudo sed -i '/\b\(function camera.zero\)\b/d' ~/.bash_aliases
 sudo sed -i '/\b\(function camera.focus\)\b/d' ~/.bash_aliases
