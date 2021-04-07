@@ -89,6 +89,7 @@ class TrackballController():
 
 	def handleButtonChanges(buttonDictionary):
 		movementThreshold = 5
+		lightingIncrement = 8
 		minMode = 0
 		maxMode = 10
 			
@@ -162,14 +163,14 @@ class TrackballController():
 			#print(' Mode: Red Scene Lighting Control ')
 			currentLevel = buttonDictionary['lightR']
 			if int(up) > movementThreshold:
-				if currentLevel < 255:
-					buttonDictionary.update({'lightR': currentLevel + 1})
+				if currentLevel <= (255 - lightingIncrement):
+					buttonDictionary.update({'lightR': currentLevel + lightingIncrement})
 				else: 
 					buttonDictionary.update({'lightR': 0})
 				Light.updateLight(buttonDictionary)
 			elif int(down) > movementThreshold:
-				if currentLevel > 0:
-					buttonDictionary.update({'lightR': currentLevel - 1})
+				if currentLevel >= lightingIncrement:
+					buttonDictionary.update({'lightR': currentLevel - lightingIncrement})
 				else: 
 					buttonDictionary.update({'lightR': 255})
 				Light.updateLight(buttonDictionary)
@@ -181,14 +182,14 @@ class TrackballController():
 			#print(' Mode: Green Scene Lighting Control ')
 			currentLevel = buttonDictionary['lightG']
 			if int(up) > movementThreshold:
-				if currentLevel < 255:
-					buttonDictionary.update({'lightG': currentLevel + 1})
+				if currentLevel <= (255 - lightingIncrement):
+					buttonDictionary.update({'lightG': currentLevel + lightingIncrement})
 				else: 
 					buttonDictionary.update({'lightG': 0})
 				Light.updateLight(buttonDictionary)
 			elif int(down) > movementThreshold:
-				if currentLevel > 0:
-					buttonDictionary.update({'lightG': currentLevel - 1})
+				if currentLevel >= lightingIncrement:
+					buttonDictionary.update({'lightG': currentLevel - lightingIncrement})
 				else: 
 					buttonDictionary.update({'lightG': 255})
 				Light.updateLight(buttonDictionary)
@@ -200,14 +201,14 @@ class TrackballController():
 			#print(' Mode: Blue Scene Lighting Control ')
 			currentLevel = buttonDictionary['lightB']
 			if int(up) > movementThreshold:
-				if currentLevel < 255:
-					buttonDictionary.update({'lightB': currentLevel + 1})
+				if currentLevel <= (255 - lightingIncrement):
+					buttonDictionary.update({'lightB': currentLevel + lightingIncrement})
 				else: 
 					buttonDictionary.update({'lightB': 0})
 				Light.updateLight(buttonDictionary)
 			elif int(down) > movementThreshold:
-				if currentLevel > 0:
-					buttonDictionary.update({'lightB': currentLevel - 1})
+				if currentLevel >= lightingIncrement:
+					buttonDictionary.update({'lightB': currentLevel - lightingIncrement})
 				else: 
 					buttonDictionary.update({'lightB': 255})
 				Light.updateLight(buttonDictionary)
@@ -219,14 +220,14 @@ class TrackballController():
 			#print(' Mode: Natural White Scene Lighting Control ')
 			currentLevel = buttonDictionary['lightW']
 			if int(up) > movementThreshold:
-				if currentLevel < 255:
-					buttonDictionary.update({'lightW': currentLevel + 1})
+				if currentLevel <= (255 - lightingIncrement):
+					buttonDictionary.update({'lightW': currentLevel + lightingIncrement})
 				else: 
 					buttonDictionary.update({'lightW': 0})
 				Light.updateLight(buttonDictionary)
 			elif int(down) > movementThreshold:
-				if currentLevel > 0:
-					buttonDictionary.update({'lightW': currentLevel - 1})
+				if currentLevel >= lightingIncrement:
+					buttonDictionary.update({'lightW': currentLevel - lightingIncrement})
 				else: 
 					buttonDictionary.update({'lightW': 255})
 				Light.updateLight(buttonDictionary)
