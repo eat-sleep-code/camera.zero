@@ -1,6 +1,6 @@
 # Camera Zero
 
-Combining this program with a Raspberry Pi HQ camera, a Raspberry Pi Zero WH, a PiMoRoNi trackball breakout, and an Adafruit 16-LED NeoPixel ring will result in a neat little screenless camera that can be controlled with your thumb.
+Combining Camera Zero with a Raspberry Pi HQ camera, a Raspberry Pi Zero WH, a PiMoRoNi trackball breakout, and an Adafruit 16-LED NeoPixel ring will result in a neat little screenless camera that can be controlled with your thumb.
 
 ---
 ## Getting Started
