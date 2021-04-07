@@ -390,7 +390,12 @@ try:
 					echoOn()
 					camera.close()
 					try:
-						subprocess.Popen(['sudo', 'svc', '-d', '/etc/service/camera.zero'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+						# Tell service to not auto restart after it is killed
+						subprocess.run(['sudo', 'svc', '-d', '/etc/service/camera.zero'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+						
+						# Kill the current running service
+						subprocess.run(['sudo', 'svc', '-k', '/etc/service/camera.zero'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+						
 					except Exception as ex:
 						pass
 					time.sleep(1.0)
