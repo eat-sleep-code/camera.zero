@@ -2,6 +2,8 @@
 
 Combining Camera Zero with a Raspberry Pi HQ camera, a Raspberry Pi Zero WH, a PiMoRoNi trackball breakout, and an Adafruit 16-LED NeoPixel ring will result in a neat little screenless camera that can be controlled with your thumb.
 
+  ![Camera](https://github.com/eat-sleep-code/camera.zero/raw/master/images/Camera%20Zero%20-%20LED%20-%20Bright%20White.jpg)
+
 ---
 ## Getting Started
 
