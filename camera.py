@@ -23,6 +23,8 @@ buttons = TrackballController()
 statusDictionary = {'message': '', 'action': '', 'colorR': 0, 'colorG': 0, 'colorB': 0, 'colorW': 0}
 buttonDictionary = {'switchMode': 0, 'shutterUp': False, 'shutterDown': False, 'isoUp': False, 'isoDown': False, 'evUp': False, 'evDown': False, 'bracketUp': False, 'bracketDown': False, 'capture': False, 'captureVideo': False, 'isRecording': False, 'lightR': 0, 'lightB': 0, 'lightG': 0, 'lightW': 0, 'exit': False, 'remote': False}
 
+outputLog = open('~/home/pi/camera.zero/logs/output.log', 'w+')
+errorLog = open('~/home/pi/camera.zero/logs/error.log', 'w+')
 
 previewVisible = False
 previewWidth = 800
@@ -61,9 +63,9 @@ raw = False
 # === Echo Control =============================================================
 
 def echoOff():
-	subprocess.Popen(['stty', '-echo'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+	subprocess.Popen(['stty', '-echo'], shell=True, stdout=subprocess.DEVNULL, stderr=errorLog)
 def echoOn():
-	subprocess.Popen(['stty', 'echo'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+	subprocess.Popen(['stty', 'echo'], shell=True, stdout=subprocess.DEVNULL, stderr=errorLog)
 def clear():
 	subprocess.Popen('clear' if os.name == 'posix' else 'cls')
 clear()
@@ -391,21 +393,25 @@ try:
 					camera.close()
 					try:
 						# Tell service to not auto restart after it is killed
-						subprocess.run(['sudo', 'svc', '-d', '/etc/service/camera.zero'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+						subprocess.run('sudo svc -d /etc/service/camera.zero'], shell=True, stdout=outputLog, stderr=errorLog)
 						
 						# Kill the current running service
-						subprocess.run(['sudo', 'svc', '-k', '/etc/service/camera.zero'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+						subprocess.run(['sudo svc -k /etc/service/camera.zero'], shell=True, stdout=outputLog, stderr=errorLog)
 						
 					except Exception as ex:
+						print(ex)
 						pass
 					time.sleep(1.0)
 					
 					if buttonDictionary['remote'] == True:
 						try:
-							subprocess.Popen(['sudo', 'python3', '/home/pi/camera.remote/camera.py'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)	
+							print(' Launching remote control... ')
+							subprocess.Popen(['sudo', '/usr/bin/python3', '/home/pi/camera.remote/camera.py'], stdout=outputLog, stderr=errorLog)	
 						except Exception as ex:
 							print(' Could not launch remote control. ')
 					
+					outputLog.close()
+					errorLog.close()
 					sys.exit(0)
 					
 				# Capture

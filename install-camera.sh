@@ -26,6 +26,7 @@ echo -e '\033[93mInstalling Camera Zero... \033[0m'
 cd ~
 sudo rm -Rf ~/camera.zero
 sudo git clone https://github.com/eat-sleep-code/camera.zero
+sudo mkdir -p ~/home/pi/camera.zero/logs
 sudo chown -R $USER:$USER camera.zero
 cd camera.zero
 sudo chmod +x camera.py
