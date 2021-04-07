@@ -31,6 +31,9 @@ camera.zero
 
 ### Trackball Controls
 - Scroll left and right to change setting selection:
+     - Exit
+        - Press for 5 to 9 seconds to exit the program and launch [Camera Remote](https://github.com/eat-sleep-code/camera.zero) (if installed)
+        - Press for 10+ seconds to exit the program
      - Capture Photo
      - Capture Video
      - Shutter Speed
@@ -45,7 +48,7 @@ camera.zero
 - Press the trackball to trigger the shutter
 
 ### Web Controls
-If you need to control your camera via a web-based interface, please see [camera.remote](https://github.com/eat-sleep-code/camera.remote).
+If you need to control your camera via a web-based interface, please see [Camera Remote](https://github.com/eat-sleep-code/camera.remote).
 
 ---
 
