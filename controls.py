@@ -34,7 +34,7 @@ class TrackballController():
 		trackball.set_rgbw(0, 0, 0, 0)
 
 	def setColorToDefault():
-		trackball.set_rgbw(128, 128, 128, 128)
+		trackball.set_rgbw(160, 160, 160, 160)
 
 	def setColor(r, g, b, w, mode):
 		if mode == 'flash':
@@ -62,23 +62,23 @@ class TrackballController():
 	def setSwitchModeColor(buttonDictionary):
 		currentMode = buttonDictionary['switchMode']
 		if currentMode == 1:
-			TrackballController.setColor( 128, 0, 0, 0, 'static')
+			TrackballController.setColor( 160, 0, 0, 0, 'static')
 		if currentMode == 2:
-			TrackballController.setColor( 128, 64, 0, 0, 'static')
+			TrackballController.setColor( 160, 96, 0, 0, 'static')
 		elif currentMode == 3:
-			TrackballController.setColor( 64, 64, 0, 0, 'static')
+			TrackballController.setColor( 96, 96, 0, 0, 'static')
 		elif currentMode == 4:
-			TrackballController.setColor( 0, 64, 64, 0, 'static')
+			TrackballController.setColor( 0, 96, 96, 0, 'static')
 		elif currentMode == 5:
-			TrackballController.setColor( 64, 0, 64, 0, 'static')
+			TrackballController.setColor( 96, 0, 96, 0, 'static')
 		elif currentMode == 6:
-			TrackballController.setColor( 64, 0, 0, 0, 'static')
+			TrackballController.setColor( 96, 0, 0, 0, 'static')
 		elif currentMode == 7:
-			TrackballController.setColor( 0, 64, 0, 0, 'static')
+			TrackballController.setColor( 0, 96, 0, 0, 'static')
 		elif currentMode == 8:
-			TrackballController.setColor( 0, 0, 64, 0, 'static')
+			TrackballController.setColor( 0, 0, 96, 0, 'static')
 		elif currentMode == 9:
-			TrackballController.setColor( 0, 0, 0, 64, 'static')
+			TrackballController.setColor( 0, 0, 0, 96, 'static')
 		elif currentMode == 10:
 			TrackballController.setColor( 101, 67, 33, 0, 'static')
 		else:
