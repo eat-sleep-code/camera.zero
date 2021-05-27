@@ -10,7 +10,7 @@ sudo apt update
 echo ''
 echo -e '\033[93mInstalling prerequisites... \033[0m'
 sudo apt install -y git python3 python3-pip python3-picamera daemontools daemontools-run
-sudo pip3 install RPi.GPIO trackball adafruit-circuitpython-neopixel
+sudo pip3 install RPi.GPIO trackball adafruit-circuitpython-neopixel --force
 
 echo ''
 echo -e '\033[93mInstalling DNG support... \033[0m'
