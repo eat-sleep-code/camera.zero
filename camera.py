@@ -1,6 +1,5 @@
 #/usr/bin/python3
 from picamera import PiCamera
-from pidng.core import RPICAM2DNG
 from controls import Light, TrackballController
 import datetime
 import fractions
@@ -11,13 +10,12 @@ import sys
 import threading
 import time
 
-
-version = '2022.01.03'
+version = '2022.01.06'
 
 camera = PiCamera()
 PiCamera.CAPTURE_TIMEOUT = 1500
 camera.resolution = camera.MAX_RESOLUTION
-dng = RPICAM2DNG()
+
 running = False
 buttons = TrackballController()
 statusDictionary = {'message': '', 'action': '', 'colorR': 0, 'colorG': 0, 'colorB': 0, 'colorW': 0}
@@ -57,6 +55,13 @@ outputFolder = 'dcim/'
 timer = 0
 
 raw = False
+try:
+	from pidng.core import RPICAM2DNG
+	dng = RPICAM2DNG()
+	raw = False # Going to disable this by default as the Pi Zero W struggles with it 
+except:
+	print( ' WARNING: DNG file format not currently supported on this device.  ')
+
 
 
 
@@ -306,8 +311,10 @@ def captureImage(filepath, raw = True):
 # ------------------------------------------------------------------------------		
 
 def convertBayerDataToDNG(filepath):
-	dng.convert(filepath)
-
+	try:
+		dng.convert(filepath)
+	except:
+		pass
 
 # ------------------------------------------------------------------------------
 def createControls():
