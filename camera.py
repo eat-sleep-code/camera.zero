@@ -1,32 +1,61 @@
-#/usr/bin/python3
-from picamera import PiCamera
+from functions import Echo, Console
+from libcamera import ColorSpace, controls, Transform
+from picamera2 import MappedArray, Picamera2, Preview
+from picamera2.controls import Controls
+from picamera2.outputs import FileOutput
+from picamera2.encoders import H264Encoder, Quality
 from controls import Light, TrackballController
+from PIL import Image
+import argparse
 import datetime
 import fractions
 import os
-import signal
+import piexif
 import subprocess
 import sys
 import threading
 import time
 
-version = '2022.01.06'
+version = '2024.02.07'
 
-camera = PiCamera()
-PiCamera.CAPTURE_TIMEOUT = 1500
-camera.resolution = camera.MAX_RESOLUTION
+
+console = Console()
+echo = Echo()
+camera = Picamera2()
+camera.set_logging(Picamera2.ERROR)
+stillConfiguration = camera.create_still_configuration(main={"size": (1920, 1080)})
+videoConfiguration = camera.create_video_configuration(main={"size": (1920, 1080)})
+try:
+	camera.set_controls({"AfMode": controls.AfModeEnum.Continuous})
+except Exception as ex:
+	console.info('Camera does not support autofocus.')
+	time.sleep(3)
+	pass
+
+# === Argument Handling ========================================================
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--rotate', dest='rotate', help='Rotate the camera in 90* increments', type=int)
+parser.add_argument('--exifFStop', dest='exifFStop', help='Set the numeric F-Stop value in the image EXIF data', type=float)
+parser.add_argument('--exifFocalLength', dest='exifFocalLength', help='Set the numeric Focal Length value (mm) in the image EXIF data', type=float)
+parser.add_argument('--exifFocalLengthEquivalent', dest='exifFocalLengthEquivalent', help='Set the numeric 35mm Focal Length value (mm) in the image EXIF data', type=float)
+args = parser.parse_args()
+
 
 running = False
 buttons = TrackballController()
 statusDictionary = {'message': '', 'action': '', 'colorR': 0, 'colorG': 0, 'colorB': 0, 'colorW': 0}
 buttonDictionary = {'switchMode': 0, 'shutterUp': False, 'shutterDown': False, 'isoUp': False, 'isoDown': False, 'evUp': False, 'evDown': False, 'bracketUp': False, 'bracketDown': False, 'capture': False, 'captureVideo': False, 'isRecording': False, 'lightR': 0, 'lightB': 0, 'lightG': 0, 'lightW': 0, 'exit': False, 'remote': False}
 
-outputLog = open('/home/pi/camera.zero/logs/output.log', 'w+')
-errorLog = open('/home/pi/camera.zero/logs/error.log', 'w+')
-
 previewVisible = False
 previewWidth = 800
 previewHeight = 460
+
+rotate = args.rotate or 0
+try:
+	rotate = int(rotate)
+except:
+	rotate = 0
 
 shutter = 'auto'
 shutterLong = 30000
@@ -46,7 +75,7 @@ evMax = 25
 
 bracket = 0
 bracketLow = 0
-bracketHigh = 0
+bracketHigh = 0 
 
 awb = 'auto'
 
@@ -60,36 +89,28 @@ try:
 	dng = RPICAM2DNG()
 	raw = False # Going to disable this by default as the Pi Zero W struggles with it 
 except:
-	print( ' WARNING: DNG file format not currently supported on this device.  ')
+	console.info( ' WARNING: DNG file format not currently supported on this device. ')
 
 
+# === Data Objects ============================================================
 
+class EXIFData:
+	def __init__(self, Orientation = 1, FStop = None, FocalLength = None, FocalLengthEquivalent = None):
 
-# === Echo Control =============================================================
+		self.Orientation = Orientation
+		self.FStop = FStop
+		self.FocalLength = FocalLength
+		self.FocalLengthEquivalent = FocalLengthEquivalent
+		
 
-os.environ['TERM'] = 'xterm-256color'
-def echoOff():
-	subprocess.Popen(['stty', '-echo'], shell=True, stdout=subprocess.DEVNULL, stderr=errorLog)
-def echoOn():
-	subprocess.Popen(['stty', 'echo'], shell=True, stdout=subprocess.DEVNULL, stderr=errorLog)
-def clear():
-	subprocess.Popen('clear' if os.name == 'posix' else 'cls')
-clear()
+EXIFDataOverride = EXIFData()
+EXIFDataOverride.FStop = args.exifFStop
+EXIFDataOverride.FocalLength = args.exifFocalLength
+EXIFDataOverride.FocalLengthEquivalent = args.exifFocalLengthEquivalent
 
 
 
 # === Functions ================================================================
-
-def showInstructions(clearFirst = False, wait = 0):
-	if clearFirst == True:
-		clear()
-	else:
-		print(' ----------------------------------------------------------------------')
-
-		time.sleep(wait)
-	return
-
-# ------------------------------------------------------------------------------
 
 def setShutter(input, wait = 0):
 	global shutter
@@ -114,30 +135,30 @@ def setShutter(input, wait = 0):
 		elif camera.framerate != defaultFramerate and shutter <= shutterLongThreshold:
 			camera.framerate = defaultFramerate
 	except Exception as ex:
-		# print( ' WARNING: Could not set framerate! ')
+		# console.info( ' WARNING: Could not set framerate!')
 		pass
 	
 	try:
 		if shutter == 0:
 			camera.shutter_speed = 0
-			# print(str(camera.shutter_speed) + '|' + str(camera.framerate) + '|' + str(shutter))	
-			print(' Shutter Speed: auto')
+			# console.info(str(camera.shutter_speed) + '|' + str(camera.framerate) + '|' + str(shutter))	
+			console.info('Shutter Speed: auto')
 			statusDictionary.update({'message': 'Shutter Speed: auto'})
 		else:
 			camera.shutter_speed = shutter * 1000
-			# print(str(camera.shutter_speed) + '|' + str(camera.framerate) + '|' + str(shutter))		
+			# console.info(str(camera.shutter_speed) + '|' + str(camera.framerate) + '|' + str(shutter))		
 			floatingShutter = float(shutter/1000)
 			roundedShutter = '{:.3f}'.format(floatingShutter)
 			if shutter > shutterLongThreshold:
-				print(' Shutter Speed: ' + str(roundedShutter)  + 's [Long Exposure Mode]')
+				console.info('Shutter Speed: ' + str(roundedShutter)  + 's [Long Exposure Mode]')
 				statusDictionary.update({'message': ' Shutter Speed: ' + str(roundedShutter)  + 's [Long Exposure Mode]'})
 			else:
-				print(' Shutter Speed: ' + str(roundedShutter) + 's')
+				console.info('Shutter Speed: ' + str(roundedShutter) + 's')
 				statusDictionary.update({'message': ' Shutter Speed: ' + str(roundedShutter) + 's'})
 		time.sleep(wait)
 		return
 	except Exception as ex:
-		print(' WARNING: Invalid Shutter Speed!' + str(shutter))
+		console.info('WARNING: Invalid Shutter Speed!' + str(shutter))
 
 # ------------------------------------------------------------------------------				
 
@@ -157,17 +178,17 @@ def setISO(input, wait = 0):
 			iso = isoMax	
 	try:	
 		camera.iso = iso
-		#print(str(camera.iso) + '|' + str(iso))
+		#console.info(str(camera.iso) + '|' + str(iso))
 		if iso == 0:
-			print(' ISO: auto')
+			console.info('ISO: auto')
 			statusDictionary.update({'message': ' ISO: auto'})
 		else:	
-			print(' ISO: ' + str(iso))
+			console.info('ISO: ' + str(iso))
 			statusDictionary.update({'message': ' ISO: ' + str(iso)})
 		time.sleep(wait)
 		return
 	except Exception as ex:
-		print(' WARNING: Invalid ISO Setting! ' + str(iso))
+		console.info('WARNING: Invalid ISO Setting! ' + str(iso))
 
 # ------------------------------------------------------------------------------
 
@@ -178,12 +199,12 @@ def setExposure(input, wait = 0):
 	exposure = input
 	try:	
 		camera.exposure_mode = exposure
-		print(' Exposure Mode: ' + exposure)
+		console.info('Exposure Mode: ' + exposure)
 		statusDictionary.update({'message': ' Exposure Mode: ' + exposure})
 		time.sleep(wait)
 		return
 	except Exception as ex:
-		print(' WARNING: Invalid Exposure Mode! ')
+		console.info('WARNING: Invalid Exposure Mode!')
 				
 # ------------------------------------------------------------------------------
 
@@ -201,14 +222,14 @@ def setEV(input, wait = 0, displayMessage = True):
 		evPrefix = ''
 	try:
 		camera.exposure_compensation = ev
-		# print(str(camera.exposure_compensation) + '|' + str(ev))
+		# console.info(str(camera.exposure_compensation) + '|' + str(ev))
 		if displayMessage == True:
-			print(' Exposure Compensation: ' + evPrefix + str(ev))
+			console.info('Exposure Compensation: ' + evPrefix + str(ev))
 			statusDictionary.update({'message': ' Exposure Compensation: ' + evPrefix + str(ev)})
 		time.sleep(wait)
 		return
 	except Exception as ex: 
-		print(' WARNING: Invalid Exposure Compensation Setting! ')	
+		console.info('WARNING: Invalid Exposure Compensation Setting!')	
 		
 # ------------------------------------------------------------------------------				
 
@@ -229,12 +250,12 @@ def setBracket(input, wait = 0, displayMessage = True):
 		if bracketHigh > evMax:
 			bracketHigh = evMax
 		if displayMessage == True:
-			print(' Exposure Bracketing: ' + str(bracket))
+			console.info('Exposure Bracketing: ' + str(bracket))
 			statusDictionary.update({'message': ' Exposure Bracketing: ' + str(bracket)})
 		time.sleep(wait)
 		return
 	except Exception as ex:
-		print(' WARNING: Invalid Exposure Bracketing Value! ')
+		console.info('WARNING: Invalid Exposure Bracketing Value!')
 
 # ------------------------------------------------------------------------------
 
@@ -245,12 +266,12 @@ def setAWB(input, wait = 0):
 	awb = input
 	try:	
 		camera.awb_mode = awb
-		print(' White Balance Mode: ' + awb)
+		console.info('White Balance Mode: ' + awb)
 		statusDictionary.update({'message': ' White Balance Mode: ' + awb})
 		time.sleep(wait)
 		return
 	except Exception as ex:
-		print(' WARNING: Invalid Auto White Balance Mode! ')
+		console.info('WARNING: Invalid Auto White Balance Mode!')
 
 # ------------------------------------------------------------------------------
 
@@ -271,21 +292,69 @@ def getFileName(timestamped = True, isVideo = False):
 
 # ------------------------------------------------------------------------------
 
-def getFilePath(timestamped = True, isVideo = False):
+def getfilePath(timestamped = True, isVideo = False):
 	try:
 		os.makedirs(outputFolder, exist_ok = True)
 	except OSError:
-		print (' ERROR: Creation of the output folder ' + outputFolder + ' failed! ')
-		echoOn()
+		console.error(' ERROR: Creation of the output folder ' + outputFolder + ' failed!')
+		echo.on()
 		quit()
 	else:
 		return outputFolder + getFileName(timestamped, isVideo)
 
 # ------------------------------------------------------------------------------
 
-def showPreview(x = 0, y = 0, w = 800, h = 600):
+def postProcessImage(filePath, angle):
+
+	global EXIFDataOverride
+
+	try:
+		image = Image.open(filePath)
+		FileEXIFData = piexif.load(filePath)
+
+		if angle > 0:
+			newOrientation = 1
+			if angle == 90:
+				newOrientation = 6
+				image = image.rotate(-90, expand=True)
+			elif angle == 180:
+				newOrientation = 3
+				image = image.rotate(180, expand=True)
+			elif angle == 270:
+				newOrientation = 8
+				image = image.rotate(90, expand=True)
+			EXIFDataOverride.Orientation = newOrientation
+				
+			FileEXIFData['Orientation'] = EXIFDataOverride.Orientation
+
+		try:
+			if EXIFDataOverride.FStop is not None:
+				FileEXIFData['Exif'][piexif.ExifIFD.FNumber] = (int(EXIFDataOverride.FStop * 100), 100)
+				
+			if EXIFDataOverride.FocalLength is not None:
+				FileEXIFData['Exif'][piexif.ExifIFD.FocalLength] = (int(EXIFDataOverride.FocalLength * 100), 100)
+				
+			if EXIFDataOverride.FocalLengthEquivalent is not None:
+				FileEXIFData['Exif'][piexif.ExifIFD.FocalLengthIn35mmFilm] = int(EXIFDataOverride.FocalLengthEquivalent)
+		except Exception as ex:
+			console.warn('Could not rotate apply additional EXIF data to image.   Please check supplied data. ' + str(ex))
+			pass
+
+		EXIFBytes = piexif.dump(FileEXIFData)
+		image.save(filePath, exif=EXIFBytes)
+	except Exception as ex:
+		console.warn('Could not rotate ' + filePath + ' ' + str(angle) + ' degrees. ' + str(ex))
+		pass
+
+# ------------------------------------------------------------------------------
+
+def showPreview(xPosition = 0, yPosition = 0, w = 800, h = 600):
 	global previewVisible
-	camera.start_preview(fullscreen=False, resolution=(w, h), window=(x, y, w, h))	
+	try:
+		camera.start_preview(Preview.QTGL, x=xPosition, y=yPosition, width=w, height=h) # transform=Transform(hflip=1)
+	except Exception as ex:
+		console.warn('Could not display preview window.')
+		pass
 	previewVisible = True
 	time.sleep(0.1)
 	return
@@ -294,25 +363,37 @@ def showPreview(x = 0, y = 0, w = 800, h = 600):
 
 def hidePreview():
 	global previewVisible
-	camera.stop_preview()
+	try:
+		camera.stop_preview()
+	except Exception as ex:
+		console.warn('Could not hide preview window.')
+		pass
 	previewVisible = False
 	time.sleep(0.1)
 	return
 
 # ------------------------------------------------------------------------------
 
-def captureImage(filepath, raw = True):
-	camera.capture(filepath, quality=100, bayer=raw)
+def captureImage(filePath, raw = True):
+	global rotate
+
+	console.info('Capturing ' + str(filePath) + ' ...')		
+	request = camera.switch_mode_and_capture_request(stillConfiguration)
+	request.save('main', filePath)
+	request.release()
+
+	postProcessImage(filePath, rotate)
+				
 	if raw == True:
-		conversionThread = threading.Thread(target=convertBayerDataToDNG, args=(filepath,))
+		conversionThread = threading.Thread(target=convertBayerDataToDNG, args=(filePath,))
 		conversionThread.daemon = True
 		conversionThread.start()
 
 # ------------------------------------------------------------------------------		
 
-def convertBayerDataToDNG(filepath):
+def convertBayerDataToDNG(filePath):
 	try:
-		dng.convert(filepath)
+		dng.convert(filePath)
 	except:
 		pass
 
@@ -339,231 +420,201 @@ controlsThread.start()
 
 
 try:
-	echoOff()
+	echo.clear()
+	os.chdir('/home/pi') 
+	
+	console.info('Camera Zero ' + version )
+	console.print('----------------------------------------------------------------------', '\n ', '\n ')
+	
+
+
 	imageCount = 1
 	isRecording = False
+	mode = 'persistant'
 
-	try:
-		os.chdir('/home/pi') 
-	except:
-		pass
+	setShutter(shutter, 0)		
+	setISO(iso, 0)
+	setExposure(exposure, 0)
+	setEV(ev, 0)
+	setBracket(bracket, 0)
+	setAWB(awb, 0)
 	
-	def Capture(mode = 'persistent'):
-		global previewVisible
-		global previewWidth
-		global previewHeight
-		global shutter
-		global shutterLong
-		global shutterShort
-		global iso
-		global isoMin
-		global isoMax
-		global exposure
-		global ev
-		global evMin
-		global evMax
-		global bracket
-		global awb
-		global timer
-		global raw
-		global imageCount
-		global isRecording
-		global statusDictionary
-		global buttonDictionary
-
-		
-
-		# print(str(camera.resolution))
-		camera.sensor_mode = 3
-
-		print('\n Camera Zero ' + version )
-		print('\n ----------------------------------------------------------------------')
-		time.sleep(2)
-
-		
-		setShutter(shutter, 0)		
-		setISO(iso, 0)
-		setExposure(exposure, 0)
-		setEV(ev, 0)
-		setBracket(bracket, 0)
-		setAWB(awb, 0)
-		
-		showInstructions(False, 0)
-		showPreview(0, 0, previewWidth, previewHeight)
-		
-		while True:
-			try:
-				# Exit / Spawn
-				if buttonDictionary['exit'] == True or buttonDictionary['remote'] == True:
-					running = False
-					darkMode()
-					echoOn()
-					camera.close()
+	
+	showPreview(0, 0, previewWidth, previewHeight)
+	
+	while True:
+		try:
+			# Exit / Spawn
+			if buttonDictionary['exit'] == True or buttonDictionary['remote'] == True:
+				running = False
+				darkMode()
+				echo.on()
+				camera.close()
+				try:
+					# Tell service to not auto restart after it is killed
+					subprocess.run('sudo svc -d /etc/service/camera.zero', shell=True)
+					
+					# Kill the current running service
+					subprocess.run('sudo svc -k /etc/service/camera.zero', shell=True)
+					
+				except Exception as ex:
+					console.warn(ex)
+					pass
+				time.sleep(1.0)
+				
+				if buttonDictionary['remote'] == True:
 					try:
-						# Tell service to not auto restart after it is killed
-						subprocess.run('sudo svc -d /etc/service/camera.zero', shell=True, stdout=outputLog, stderr=errorLog)
-						
-						# Kill the current running service
-						subprocess.run('sudo svc -k /etc/service/camera.zero', shell=True, stdout=outputLog, stderr=errorLog)
-						
+						console.info('Launching remote control...')
+						subprocess.Popen(['sudo', '/usr/bin/python3', '/home/pi/camera.remote/camera.py'])	
 					except Exception as ex:
-						print(ex)
-						pass
-					time.sleep(1.0)
+						console.info('Could not launch remote control.')
+		
+				sys.exit(0)
+				
+			# Capture
+			elif buttonDictionary['capture'] == True:
+				
+				if mode == 'persistent':
+					# Normal photo
+					filePath = getfilePath(True)
+					console.info('Capturing image: ' + filePath + '\n')
+					captureImage(filePath, raw)
 					
-					if buttonDictionary['remote'] == True:
-						try:
-							print(' Launching remote control... ')
-							subprocess.Popen(['sudo', '/usr/bin/python3', '/home/pi/camera.remote/camera.py'], stdout=outputLog, stderr=errorLog)	
-						except Exception as ex:
-							print(' Could not launch remote control. ')
-					
-					outputLog.close()
-					errorLog.close()
-					sys.exit(0)
-					
-				# Capture
-				elif buttonDictionary['capture'] == True:
-					
-					if mode == 'persistent':
-						# Normal photo
-						filepath = getFilePath(True)
-						print(' Capturing image: ' + filepath + '\n')
-						captureImage(filepath, raw)
-						
+					imageCount += 1
+			
+					if (bracket != 0):
+						baseEV = ev
+						# Take underexposed photo
+						setEV(baseEV + bracketLow, 0, False)
+						filePath = getfilePath(True)
+						console.info('Capturing image: ' + filePath + '  [' + str(bracketLow) + ']\n')
+						captureImage(filePath, raw)
 						imageCount += 1
-				
-						if (bracket != 0):
-							baseEV = ev
-							# Take underexposed photo
-							setEV(baseEV + bracketLow, 0, False)
-							filepath = getFilePath(True)
-							print(' Capturing image: ' + filepath + '  [' + str(bracketLow) + ']\n')
-							captureImage(filepath, raw)
-							imageCount += 1
 
-							# Take overexposed photo
-							setEV(baseEV + bracketHigh, 0, False)
-							filepath = getFilePath(True)
-							print(' Capturing image: ' + filepath + '  [' + str(bracketHigh) + ']\n')
-							captureImage(filepath, raw)
-							imageCount += 1						
-							
-							# Reset EV to base photo's value
-							setEV(baseEV, 0, False)
-							
-					elif mode == 'timelapse':
-						# Timelapse photo series
-						if timer < 0:
-							timer = 1
-						while True:
-							filepath = getFilePath(False)
-							print(' Capturing timelapse image: ' + filepath + '\n')
-							captureImage(filepath, raw)
-							imageCount += 1
-							time.sleep(timer) 	
-							
-					else:
-						# Single photo and then exit
-						filepath = getFilePath(True)
-						print(' Capturing single image: ' + filepath + '\n')
-						captureImage(filepath, raw)
-						echoOn()
-						break
-
-					buttonDictionary.update({'capture': False})
-
-				elif buttonDictionary['captureVideo'] == True:
-
-					# Video
-					if isRecording == False:
-						isRecording = True
-						statusDictionary.update({'action': 'recording'})
-						filepath = getFilePath(True, True)
-						camera.resolution = (1920, 1080)
-						print(' Capturing video: ' + filepath + '\n')
-						statusDictionary.update({'message': ' Recording: Started '})
-						buttonDictionary.update({'captureVideo': False})
-						camera.start_recording(filepath, quality=20)
-					else:
-						isRecording = False
-						statusDictionary.update({'action': ''})
-						camera.stop_recording()
-						camera.resolution = camera.MAX_RESOLUTION
-						print(' Capture complete \n')
-						statusDictionary.update({'message': ' Recording: Stopped '})
-						buttonDictionary.update({'captureVideo': False})
-					
-					time.sleep(1)
-
-				# Shutter Speed	
-				elif buttonDictionary['shutterUp'] == True:
-					if shutter == 0:
-						shutter = shutterShort
-					elif shutter > shutterShort and shutter <= shutterLong:					
-						shutter = int(shutter / 1.5)
-					setShutter(shutter, 0.25)
-					buttonDictionary.update({'shutterUp': False})
-				elif buttonDictionary['shutterDown'] == True:
-					if shutter == 0:						
-						shutter = shutterLong
-					elif shutter < shutterLong and shutter >= shutterShort:					
-						shutter = int(shutter * 1.5)
-					elif shutter == shutterShort:
-						shutter = 0
-					setShutter(shutter, 0.25)
-					buttonDictionary.update({'shutterDown': False})
-
-				# ISO
-				elif buttonDictionary['isoUp'] == True:
-					if iso == 0:
-						iso = isoMin
-					elif iso >= isoMin and iso < isoMax:					
-						iso = int(iso * 2)
-					setISO(iso, 0.25)
-					buttonDictionary.update({'isoUp': False})
-				elif buttonDictionary['isoDown'] == True:
-					if iso == 0:
-						iso = isoMax
-					elif iso <= isoMax and iso > isoMin:					
-						iso = int(iso / 2)
-					elif iso == isoMin:
-						iso = 0
-					setISO(iso, 0.25)
-					buttonDictionary.update({'isoDown': False})
-
-				# Exposure Compensation
-				elif buttonDictionary['evUp'] == True:
-					if ev >= evMin and ev < evMax:					
-						ev = int(ev + 1)
-						setEV(ev, 0.25)
-						buttonDictionary.update({'evUp': False})
-				elif buttonDictionary['evDown'] == True:
-					if ev <= evMax and ev > evMin:					
-						ev = int(ev - 1)
-						setEV(ev, 0.25)
-						buttonDictionary.update({'evDown': False})
+						# Take overexposed photo
+						setEV(baseEV + bracketHigh, 0, False)
+						filePath = getfilePath(True)
+						console.info('Capturing image: ' + filePath + '  [' + str(bracketHigh) + ']\n')
+						captureImage(filePath, raw)
+						imageCount += 1						
 						
-				# Exposure Bracketing
-				elif buttonDictionary['bracketUp'] == True:
-					if bracket < evMax:
-						bracket = int(bracket + 1)
-						setBracket(bracket, 0.25)
-						buttonDictionary.update({'bracketUp': False})
-				elif buttonDictionary['bracketDown'] == True:
-					if bracket > 0:					
-						bracket = int(bracket - 1)
-						setBracket(bracket, 0.25)
-						buttonDictionary.update({'bracketDown': False})
+						# Reset EV to base photo's value
+						setEV(baseEV, 0, False)
+						
+				elif mode == 'timelapse':
+					# Timelapse photo series
+					if timer < 0:
+						timer = 1
+					while True:
+						filePath = getfilePath(False)
+						console.info('Capturing timelapse image: ' + filePath + '\n')
+						captureImage(filePath, raw)
+						imageCount += 1
+						time.sleep(timer) 	
+						
+				else:
+					# Single photo and then exit
+					filePath = getfilePath(True)
+					console.info('Capturing single image: ' + filePath + '\n')
+					captureImage(filePath, raw)
+					echo.on()
+					break
 
+				buttonDictionary.update({'capture': False})
+
+			elif buttonDictionary['captureVideo'] == True:
+
+				# Video
+				if isRecording == False:
+					isRecording = True
+					statusDictionary.update({'action': 'recording'})
+					filePath = getfilePath(True, True)
+					camera.resolution = (1920, 1080)
+					console.info('Capturing video: ' + filePath + '\n')
+					statusDictionary.update({'message': ' Recording: Started '})
+					buttonDictionary.update({'captureVideo': False})
+					camera.configure(videoConfiguration)
+					encoder = H264Encoder()
+					camera.start_recording(encoder, filePath, quality=Quality.VERY_HIGH)
+
+				else:
+					isRecording = False
+					statusDictionary.update({'action': ''})
+					camera.stop_recording()
+					console.info('Capture complete \n')
+					statusDictionary.update({'message': ' Recording: Stopped '})
+					buttonDictionary.update({'captureVideo': False})
 				
-			except Exception as ex:
-				print(str(ex))
-				pass
+				time.sleep(1)
 
-	Capture()
+			# Shutter Speed	
+			elif buttonDictionary['shutterUp'] == True:
+				if shutter == 0:
+					shutter = shutterShort
+				elif shutter > shutterShort and shutter <= shutterLong:					
+					shutter = int(shutter / 1.5)
+				setShutter(shutter, 0.25)
+				buttonDictionary.update({'shutterUp': False})
+			elif buttonDictionary['shutterDown'] == True:
+				if shutter == 0:						
+					shutter = shutterLong
+				elif shutter < shutterLong and shutter >= shutterShort:					
+					shutter = int(shutter * 1.5)
+				elif shutter == shutterShort:
+					shutter = 0
+				setShutter(shutter, 0.25)
+				buttonDictionary.update({'shutterDown': False})
+
+			# ISO
+			elif buttonDictionary['isoUp'] == True:
+				if iso == 0:
+					iso = isoMin
+				elif iso >= isoMin and iso < isoMax:					
+					iso = int(iso * 2)
+				setISO(iso, 0.25)
+				buttonDictionary.update({'isoUp': False})
+			elif buttonDictionary['isoDown'] == True:
+				if iso == 0:
+					iso = isoMax
+				elif iso <= isoMax and iso > isoMin:					
+					iso = int(iso / 2)
+				elif iso == isoMin:
+					iso = 0
+				setISO(iso, 0.25)
+				buttonDictionary.update({'isoDown': False})
+
+			# Exposure Compensation
+			elif buttonDictionary['evUp'] == True:
+				if ev >= evMin and ev < evMax:					
+					ev = int(ev + 1)
+					setEV(ev, 0.25)
+					buttonDictionary.update({'evUp': False})
+			elif buttonDictionary['evDown'] == True:
+				if ev <= evMax and ev > evMin:					
+					ev = int(ev - 1)
+					setEV(ev, 0.25)
+					buttonDictionary.update({'evDown': False})
+					
+			# Exposure Bracketing
+			elif buttonDictionary['bracketUp'] == True:
+				if bracket < evMax:
+					bracket = int(bracket + 1)
+					setBracket(bracket, 0.25)
+					buttonDictionary.update({'bracketUp': False})
+			elif buttonDictionary['bracketDown'] == True:
+				if bracket > 0:					
+					bracket = int(bracket - 1)
+					setBracket(bracket, 0.25)
+					buttonDictionary.update({'bracketDown': False})
+
+			
+		except Exception as ex:
+			console.error(str(ex))
+			pass
+
+	
 
 except KeyboardInterrupt:
 	darkMode()
-	echoOn()
+	echo.on() 
 	sys.exit(0)
