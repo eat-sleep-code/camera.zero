@@ -1,9 +1,3 @@
-# Compatibility Notice
-
-Due to breaking changes in the Raspberry Pi OS camera stack, if you wish to use this software on a Raspberry Pi running "Bullseye" (or newer) version of Raspberry Pi OS, you must enable Legacy Camera Support via `sudo raspi-config` > *Interface Options* > *Legacy Camera*.
-
----
-
 # Camera Zero
 
 Combining Camera Zero with an Arducam 12MP camera, a Raspberry Pi Zero WH, a PiMoRoNi trackball breakout, and an Adafruit 16-LED NeoPixel ring will result in a neat little screenless camera that can be controlled with your thumb.
@@ -13,11 +7,10 @@ Combining Camera Zero with an Arducam 12MP camera, a Raspberry Pi Zero WH, a PiM
 ---
 ## Getting Started
 
+- Use [Raspberry Pi Imager](https://www.raspberrypi.com/software) to install Raspberry Pi OS Lite *(Bookworm)* on a microSD card
 - Use [raspi-config](https://www.raspberrypi.org/documentation/configuration/raspi-config.md) to:
   - Set the Memory Split value to a value of at least 192MB
-  - Enable the CSI camera interface
   - Enable the I2C interface
-  - Enable Legacy Camera support (if applicable)
   - Set up your WiFi connection
 - Connect the camera to your Raspberry Pi
 
@@ -35,8 +28,25 @@ sudo chmod +x ~/install-camera.sh && ~/install-camera.sh
 
 ## Usage
 ```
-camera.zero
+camera.zero <options>
 ```
+
+### Options
+
++ _--rotate_ : Rotate the camera in 90&deg; increments     *(default: 0)*
++ _--exifFStop_ : Set the numeric F-Stop value in the image EXIF data *(default: Not specified)*
++ _--exifFocalLength_ : Set the numeric Focal Length value (mm) in the image EXIF data *(default: Not specified)*
++ _--exifFocalLengthEquivalent_ : Set the numeric 35mm Focal Length value (mm) in the image EXIF data *(default: Not specified)*
+
+
+### Example
+```bash
+camera.zero --rotate 180 --exifFStop 2.2 --exifFocalLength 2.75 --exifFocalLengthEquivalent 16
+```
+
+> [!TIP]
+> The EXIF data shown above is completely optional but may prove useful when using captured images with third-party applications such as photogrammetry software.
+
 
 ### Trackball Controls
 - Scroll left and right to change setting selection:
@@ -76,13 +86,21 @@ If you are using an infrared (IR) camera, you will need to modify the Auto White
 
 This can be achieved by executing `sudo nano /boot/config.txt` and adding the following lines.
 
-```
+```bash
 # Camera Settings 
 awb_auto_is_greyworld=1
 ```
 
-Also note, that while IR cameras utilize "invisible" (outside the spectrum of the human eye) light, they can not magically see in the dark.   You will need to illuminate night scenes with one or more [IR emitting LEDs](https://www.adafruit.com/product/387) to take advantage of an Infrared Camera.
+> [!NOTE]
+> While IR cameras utilize "invisible" (outside the spectrum of the human eye) light, they can not magically see in the dark.   You will need to illuminate night scenes with one or more IR lights to take advantage of an Infrared Camera.
 
 ---
 
-:information_source: *This application was developed using a Raspberry Pi HQ (2020) camera and Raspberry Pi Zero WH and Raspberry Pi 4B boards.   Issues may arise if you are using either third party or older hardware.*
+> [!TIP]
+> If you are using a Raspberry Pi with 1GB &ndash; or less &ndash; of memory, you may wish to increase your SWAP file to match your memory size as outlined in this [third-party guide](https://pimylifeup.com/raspberry-pi-swap-file/).
+
+---
+
+> [!IMPORTANT]
+> *This application was developed using a Raspberry Pi V3 12MP (2023) camera and a Raspberry Pi Zero 2 W board.   This application should also work without issue with Raspberry Pi Zero W boards.   This application should also work with Raspberry Pi HQ (2020) cameras.   Issues may arise if you are using either third party or older hardware.*
+

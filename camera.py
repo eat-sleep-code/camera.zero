@@ -9,6 +9,7 @@ from PIL import Image
 import argparse
 import datetime
 import fractions
+import globals
 import os
 import piexif
 import subprocess
@@ -23,8 +24,9 @@ console = Console()
 echo = Echo()
 camera = Picamera2()
 camera.set_logging(Picamera2.ERROR)
-stillConfiguration = camera.create_still_configuration(main={"size": (1920, 1080)})
-videoConfiguration = camera.create_video_configuration(main={"size": (1920, 1080)})
+controls = Controls(camera)
+stillConfiguration = camera.create_still_configuration(main={"size": camera.sensor_resolution}, colour_space = ColorSpace.Sycc())
+videoConfiguration = camera.create_video_configuration(main={"size": (1920, 1080)}, colour_space = ColorSpace.Rec709())
 try:
 	camera.set_controls({"AfMode": controls.AfModeEnum.Continuous})
 except Exception as ex:
@@ -44,8 +46,6 @@ args = parser.parse_args()
 
 running = False
 buttons = TrackballController()
-statusDictionary = {'message': '', 'action': '', 'colorR': 0, 'colorG': 0, 'colorB': 0, 'colorW': 0}
-buttonDictionary = {'switchMode': 0, 'shutterUp': False, 'shutterDown': False, 'isoUp': False, 'isoDown': False, 'evUp': False, 'evDown': False, 'bracketUp': False, 'bracketDown': False, 'capture': False, 'captureVideo': False, 'isRecording': False, 'lightR': 0, 'lightB': 0, 'lightG': 0, 'lightW': 0, 'exit': False, 'remote': False}
 
 previewVisible = False
 previewWidth = 800
@@ -113,12 +113,12 @@ EXIFDataOverride.FocalLengthEquivalent = args.exifFocalLengthEquivalent
 # === Functions ================================================================
 
 def setShutter(input, wait = 0):
+	global controls
 	global shutter
 	global shutterLong
 	global shutterLongThreshold
 	global shutterShort
 	global defaultFramerate
-	global statusDictionary
 	
 	if str(input).lower() == 'auto' or str(input) == '0':
 		shutter = 0
@@ -140,21 +140,21 @@ def setShutter(input, wait = 0):
 	
 	try:
 		if shutter == 0:
-			camera.shutter_speed = 0
-			# console.info(str(camera.shutter_speed) + '|' + str(camera.framerate) + '|' + str(shutter))	
-			console.info('Shutter Speed: auto')
-			statusDictionary.update({'message': 'Shutter Speed: auto'})
+			controls.ExposureTime = 0
+			# print(str(controls.ExposureTime) + '|' + str(controls.FrameRate) + '|' + str(shutter))	
+			print(' Shutter Speed: auto')
+			globals.statusDictionary.update({'message': 'Shutter Speed: auto'})
 		else:
-			camera.shutter_speed = shutter * 1000
-			# console.info(str(camera.shutter_speed) + '|' + str(camera.framerate) + '|' + str(shutter))		
+			controls.ExposureTime = shutter * 1000
+			# print(str(controls.ExposureTime) + '|' + str(controls.FrameRate) + '|' + str(shutter))		
 			floatingShutter = float(shutter/1000)
 			roundedShutter = '{:.3f}'.format(floatingShutter)
 			if shutter > shutterLongThreshold:
-				console.info('Shutter Speed: ' + str(roundedShutter)  + 's [Long Exposure Mode]')
-				statusDictionary.update({'message': ' Shutter Speed: ' + str(roundedShutter)  + 's [Long Exposure Mode]'})
+				print(' Shutter Speed: ' + str(roundedShutter)  + 's [Long Exposure Mode]')
+				globals.statusDictionary.update({'message': ' Shutter Speed: ' + str(roundedShutter)  + 's [Long Exposure Mode]'})
 			else:
-				console.info('Shutter Speed: ' + str(roundedShutter) + 's')
-				statusDictionary.update({'message': ' Shutter Speed: ' + str(roundedShutter) + 's'})
+				print(' Shutter Speed: ' + str(roundedShutter) + 's')
+				globals.statusDictionary.update({'message': ' Shutter Speed: ' + str(roundedShutter) + 's'})
 		time.sleep(wait)
 		return
 	except Exception as ex:
@@ -163,28 +163,30 @@ def setShutter(input, wait = 0):
 # ------------------------------------------------------------------------------				
 
 def setISO(input, wait = 0):
+	global controls
 	global iso
 	global isoMin
 	global isoMax
-	global statusDictionary
 
 	if str(input).lower() == 'auto' or str(input) == '0':
+		controls.AeEnable = 1
 		iso = 0
 	else: 
+		controls.AeEnable = 0
 		iso = int(input)
 		if iso < isoMin:	
 			iso = isoMin
 		elif iso > isoMax:
 			iso = isoMax	
 	try:	
-		camera.iso = iso
-		#console.info(str(camera.iso) + '|' + str(iso))
+		analogGain = iso/100
+		controls.AnalogueGain = analogGain
+		# print(str(camera.iso) + '|' + str(iso))
 		if iso == 0:
-			console.info('ISO: auto')
-			statusDictionary.update({'message': ' ISO: auto'})
+			print(' ISO: auto')
 		else:	
-			console.info('ISO: ' + str(iso))
-			statusDictionary.update({'message': ' ISO: ' + str(iso)})
+			print(' ISO: ' + str(iso))
+			globals.statusDictionary.update({'message': ' ISO: ' + str(iso)})
 		time.sleep(wait)
 		return
 	except Exception as ex:
@@ -194,13 +196,12 @@ def setISO(input, wait = 0):
 
 def setExposure(input, wait = 0):
 	global exposure
-	global statusDictionary
 
 	exposure = input
 	try:	
-		camera.exposure_mode = exposure
-		console.info('Exposure Mode: ' + exposure)
-		statusDictionary.update({'message': ' Exposure Mode: ' + exposure})
+		controls.AeExposureMode = exposure
+		print(' Exposure Mode: ' + exposure)
+		globals.statusDictionary.update({'message': ' Exposure Mode: ' + exposure})
 		time.sleep(wait)
 		return
 	except Exception as ex:
@@ -209,9 +210,9 @@ def setExposure(input, wait = 0):
 # ------------------------------------------------------------------------------
 
 def setEV(input, wait = 0, displayMessage = True):
+	global controls
 	global ev 
 	global bracket
-	global statusDictionary
 
 	ev = input
 	ev = int(ev)
@@ -221,11 +222,11 @@ def setEV(input, wait = 0, displayMessage = True):
 	elif ev < 0:
 		evPrefix = ''
 	try:
-		camera.exposure_compensation = ev
-		# console.info(str(camera.exposure_compensation) + '|' + str(ev))
+		controls.ExposureValue = ev
+		# print(str(camera.exposure_compensation) + '|' + str(ev))
 		if displayMessage == True:
-			console.info('Exposure Compensation: ' + evPrefix + str(ev))
-			statusDictionary.update({'message': ' Exposure Compensation: ' + evPrefix + str(ev)})
+			print(' Exposure Compensation: ' + evPrefix + str(ev))
+			globals.statusDictionary.update({'message': ' Exposure Compensation: ' + evPrefix + str(ev)})
 		time.sleep(wait)
 		return
 	except Exception as ex: 
@@ -234,24 +235,24 @@ def setEV(input, wait = 0, displayMessage = True):
 # ------------------------------------------------------------------------------				
 
 def setBracket(input, wait = 0, displayMessage = True):
+	global controls
 	global bracket
 	global bracketLow
 	global bracketHigh
 	global evMax
 	global evMin
-	global statusDictionary
 
 	bracket = int(input)
 	try:
-		bracketLow = camera.exposure_compensation - bracket
+		bracketLow = controls.ExposureValue - bracket
 		if bracketLow < evMin:
 			bracketLow = evMin
-		bracketHigh = camera.exposure_compensation + bracket
+		bracketHigh = controls.ExposureValue + bracket
 		if bracketHigh > evMax:
 			bracketHigh = evMax
 		if displayMessage == True:
-			console.info('Exposure Bracketing: ' + str(bracket))
-			statusDictionary.update({'message': ' Exposure Bracketing: ' + str(bracket)})
+			print(' Exposure Bracketing: ' + str(bracket))
+			globals.statusDictionary.update({'message': ' Exposure Bracketing: ' + str(bracket)})
 		time.sleep(wait)
 		return
 	except Exception as ex:
@@ -260,14 +261,14 @@ def setBracket(input, wait = 0, displayMessage = True):
 # ------------------------------------------------------------------------------
 
 def setAWB(input, wait = 0):
+	global controls
 	global awb
-	global statusDictionary
 
 	awb = input
 	try:	
-		camera.awb_mode = awb
-		console.info('White Balance Mode: ' + awb)
-		statusDictionary.update({'message': ' White Balance Mode: ' + awb})
+		controls.AwbMode = awb
+		print(' White Balance Mode: ' + awb)
+		globals.statusDictionary.update({'message': ' White Balance Mode: ' + awb})
 		time.sleep(wait)
 		return
 	except Exception as ex:
@@ -366,7 +367,7 @@ def hidePreview():
 	try:
 		camera.stop_preview()
 	except Exception as ex:
-		console.warn('Could not hide preview window.')
+		console.warn('Could not display preview window.')
 		pass
 	previewVisible = False
 	time.sleep(0.1)
