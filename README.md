@@ -51,7 +51,7 @@ camera.zero --rotate 180 --exifFStop 2.2 --exifFocalLength 2.75 --exifFocalLengt
 ### Trackball Controls
 - Scroll left and right to change setting selection:
      - Capture Photo
-     - Capture Video
+     - Capture Video[^1]
      - Shutter Speed
      - ISO Setting
      - Exposure Compensation
@@ -114,3 +114,6 @@ awb_auto_is_greyworld=1
 > [!IMPORTANT]
 > *This application was developed using a  Arducam 12MP camera and a Raspberry Pi Zero WH board.   This application should also work without issue with Raspberry Pi Zero 2W boards.   This application should also work with Raspberry Pi 12MP (2023) and Raspberry Pi HQ (2020) cameras.   Issues may arise if you are using either third party or older hardware.*
 
+---
+
+[^1]: Due to licensing restrictions, video is captured with an **.h264** format.   To convert the **.h264** file into the more common **.mp4** format, you can execute the following command: `ffmpeg -framerate 30 -i input.264 -c copy output.mp4`
