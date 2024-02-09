@@ -400,10 +400,10 @@ try:
 	console.print('----------------------------------------------------------------------', '\n ', '\n ')
 		
 	try:
-		if not os.environ.get('SSH_CLIENT') and not os.environ('SSH_TTY'): 
-			camera.start_preview(Preview.QTGL, 0, 0, previewWidth, previewHeight) # transform=Transform(hflip=1)
-		else: 
+		if "SSH_CONNECTION" in os.environ:
 			camera.start_preview(Preview.QT)
+		else: 
+			camera.start_preview(Preview.QTGL, 0, 0, previewWidth, previewHeight) # transform=Transform(hflip=1)
 	except:
 		console.warn('Could not start preview. ', '\n ')
 		pass
