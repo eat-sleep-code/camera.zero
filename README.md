@@ -9,7 +9,7 @@ Combining Camera Zero with an Arducam 12MP camera, a Raspberry Pi Zero WH, a PiM
 
 - Use [Raspberry Pi Imager](https://www.raspberrypi.com/software) to install Raspberry Pi OS Lite *(Bookworm)* on a microSD card
 - Use [raspi-config](https://www.raspberrypi.org/documentation/configuration/raspi-config.md) to:
-  - Set the Memory Split value to a value of at least 192MB
+  - Enable the CSI camera interface
   - Enable the I2C interface
   - Set up your WiFi connection
 - Connect the camera to your Raspberry Pi
