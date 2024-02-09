@@ -14,11 +14,19 @@ sudo pip3 install piexif RPi.GPIO trackball adafruit-circuitpython-neopixel PiDN
 
 
 echo ''
+echo -e '\033[93mProvisioning logs... \033[0m'
+sudo mkdir -p /home/pi/logs
+sudo chmod +rw /home/pi/logs
+sudo sed -i '\|^tmpfs /home/pi/logs|d' /etc/fstab
+sudo sed -i '$ a tmpfs /home/pi/logs tmpfs defaults,noatime,nosuid,size=16m 0 0' /etc/fstab
+sudo mount -a
+
+
+echo ''
 echo -e '\033[93mInstalling Camera Zero... \033[0m'
 cd ~
 sudo rm -Rf ~/camera.zero
 sudo git clone https://github.com/eat-sleep-code/camera.zero
-sudo mkdir -p ~/camera.zero/logs
 sudo chown -R $USER:$USER camera.zero
 cd camera.zero
 sudo chmod +x camera.py

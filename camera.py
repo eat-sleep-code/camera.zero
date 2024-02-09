@@ -22,6 +22,7 @@ version = '2024.02.07'
 
 console = Console()
 echo = Echo()
+globals.initialize()
 camera = Picamera2()
 camera.set_logging(Picamera2.ERROR)
 controls = Controls(camera)
@@ -158,7 +159,7 @@ def setShutter(input, wait = 0):
 		time.sleep(wait)
 		return
 	except Exception as ex:
-		console.info('WARNING: Invalid Shutter Speed!' + str(shutter))
+		console.info('WARNING: Invalid Shutter Speed! ' + str(shutter) + str(ex))
 
 # ------------------------------------------------------------------------------				
 
@@ -190,7 +191,7 @@ def setISO(input, wait = 0):
 		time.sleep(wait)
 		return
 	except Exception as ex:
-		console.info('WARNING: Invalid ISO Setting! ' + str(iso))
+		console.info('WARNING: Invalid ISO Setting! ' + str(iso) + str(ex))
 
 # ------------------------------------------------------------------------------
 
@@ -205,7 +206,7 @@ def setExposure(input, wait = 0):
 		time.sleep(wait)
 		return
 	except Exception as ex:
-		console.info('WARNING: Invalid Exposure Mode!')
+		console.info('WARNING: Invalid Exposure Mode! ' + str(ex))
 				
 # ------------------------------------------------------------------------------
 
@@ -230,7 +231,7 @@ def setEV(input, wait = 0, displayMessage = True):
 		time.sleep(wait)
 		return
 	except Exception as ex: 
-		console.info('WARNING: Invalid Exposure Compensation Setting!')	
+		console.info('WARNING: Invalid Exposure Compensation Setting! ' + str(ex))	
 		
 # ------------------------------------------------------------------------------				
 
@@ -256,7 +257,7 @@ def setBracket(input, wait = 0, displayMessage = True):
 		time.sleep(wait)
 		return
 	except Exception as ex:
-		console.info('WARNING: Invalid Exposure Bracketing Value!')
+		console.info('WARNING: Invalid Exposure Bracketing Value! ' + str(ex))
 
 # ------------------------------------------------------------------------------
 
@@ -272,7 +273,7 @@ def setAWB(input, wait = 0):
 		time.sleep(wait)
 		return
 	except Exception as ex:
-		console.info('WARNING: Invalid Auto White Balance Mode!')
+		console.info('WARNING: Invalid Auto White Balance Mode! ' + str(ex))
 
 # ------------------------------------------------------------------------------
 
@@ -352,7 +353,8 @@ def postProcessImage(filePath, angle):
 def showPreview(xPosition = 0, yPosition = 0, w = 800, h = 600):
 	global previewVisible
 	try:
-		camera.start_preview(Preview.QTGL, x=xPosition, y=yPosition, width=w, height=h) # transform=Transform(hflip=1)
+		#camera.start_preview(Preview.QTGL, x=xPosition, y=yPosition, width=w, height=h) # transform=Transform(hflip=1)
+		console.debug('Show preview...')
 	except Exception as ex:
 		console.warn('Could not display preview window.')
 		pass
@@ -365,7 +367,8 @@ def showPreview(xPosition = 0, yPosition = 0, w = 800, h = 600):
 def hidePreview():
 	global previewVisible
 	try:
-		camera.stop_preview()
+		#camera.stop_preview()
+		console.debug('Stop preview...')
 	except Exception as ex:
 		console.warn('Could not display preview window.')
 		pass
