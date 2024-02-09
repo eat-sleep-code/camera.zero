@@ -431,7 +431,7 @@ try:
 
 	imageCount = 1
 	isRecording = False
-	mode = 'persistant'
+	mode = 'persistent'
 
 
 	try:
