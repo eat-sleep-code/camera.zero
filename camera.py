@@ -405,7 +405,7 @@ try:
 		else: 
 			camera.start_preview(Preview.QTGL, 0, 0, previewWidth, previewHeight) # transform=Transform(hflip=1)
 	except:
-		console.warn('Could not start preview. ', '\n ')
+		#console.warn('Could not start preview. ', '\n ')
 		pass
 
 
