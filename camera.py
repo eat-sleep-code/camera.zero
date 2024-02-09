@@ -513,6 +513,7 @@ try:
 
 				# Video
 				if isRecording == False:
+					camera.stop()
 					isRecording = True
 					globals.statusDictionary.update({'action': 'recording'})
 					filePath = getfilePath(True, True)
@@ -531,7 +532,8 @@ try:
 					console.info('Capture complete \n')
 					globals.statusDictionary.update({'message': ' Recording: Stopped '})
 					globals.buttonDictionary.update({'captureVideo': False})
-				
+					camera.start()
+					
 				time.sleep(1)
 
 			# Shutter Speed	
