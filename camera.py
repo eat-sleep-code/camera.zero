@@ -404,11 +404,9 @@ def convertBayerDataToDNG(filePath):
 # ------------------------------------------------------------------------------
 def createControls():
 	global running
-	global statusDictionary	
-	global buttonDictionary
-	
+
 	running = True
-	TrackballController.watch(running, statusDictionary, buttonDictionary)
+	TrackballController.watch(running)
 	
 # -------------------------------------------------------------------------------
 def darkMode():
@@ -449,7 +447,7 @@ try:
 	while True:
 		try:
 			# Exit / Spawn
-			if buttonDictionary['exit'] == True or buttonDictionary['remote'] == True:
+			if globals.buttonDictionary['exit'] == True or globals.buttonDictionary['remote'] == True:
 				running = False
 				darkMode()
 				echo.on()
@@ -466,7 +464,7 @@ try:
 					pass
 				time.sleep(1.0)
 				
-				if buttonDictionary['remote'] == True:
+				if globals.buttonDictionary['remote'] == True:
 					try:
 						console.info('Launching remote control...')
 						subprocess.Popen(['sudo', '/usr/bin/python3', '/home/pi/camera.remote/camera.py'])	
@@ -476,7 +474,7 @@ try:
 				sys.exit(0)
 				
 			# Capture
-			elif buttonDictionary['capture'] == True:
+			elif globals.buttonDictionary['capture'] == True:
 				
 				if mode == 'persistent':
 					# Normal photo
@@ -524,42 +522,42 @@ try:
 					echo.on()
 					break
 
-				buttonDictionary.update({'capture': False})
+				globals.buttonDictionary.update({'capture': False})
 
-			elif buttonDictionary['captureVideo'] == True:
+			elif globals.buttonDictionary['captureVideo'] == True:
 
 				# Video
 				if isRecording == False:
 					isRecording = True
-					statusDictionary.update({'action': 'recording'})
+					globals.statusDictionary.update({'action': 'recording'})
 					filePath = getfilePath(True, True)
 					camera.resolution = (1920, 1080)
 					console.info('Capturing video: ' + filePath + '\n')
-					statusDictionary.update({'message': ' Recording: Started '})
-					buttonDictionary.update({'captureVideo': False})
+					globals.statusDictionary.update({'message': ' Recording: Started '})
+					globals.buttonDictionary.update({'captureVideo': False})
 					camera.configure(videoConfiguration)
 					encoder = H264Encoder()
 					camera.start_recording(encoder, filePath, quality=Quality.VERY_HIGH)
 
 				else:
 					isRecording = False
-					statusDictionary.update({'action': ''})
+					globals.statusDictionary.update({'action': ''})
 					camera.stop_recording()
 					console.info('Capture complete \n')
-					statusDictionary.update({'message': ' Recording: Stopped '})
-					buttonDictionary.update({'captureVideo': False})
+					globals.statusDictionary.update({'message': ' Recording: Stopped '})
+					globals.buttonDictionary.update({'captureVideo': False})
 				
 				time.sleep(1)
 
 			# Shutter Speed	
-			elif buttonDictionary['shutterUp'] == True:
+			elif globals.buttonDictionary['shutterUp'] == True:
 				if shutter == 0:
 					shutter = shutterShort
 				elif shutter > shutterShort and shutter <= shutterLong:					
 					shutter = int(shutter / 1.5)
 				setShutter(shutter, 0.25)
-				buttonDictionary.update({'shutterUp': False})
-			elif buttonDictionary['shutterDown'] == True:
+				globals.buttonDictionary.update({'shutterUp': False})
+			elif globals.buttonDictionary['shutterDown'] == True:
 				if shutter == 0:						
 					shutter = shutterLong
 				elif shutter < shutterLong and shutter >= shutterShort:					
@@ -567,17 +565,17 @@ try:
 				elif shutter == shutterShort:
 					shutter = 0
 				setShutter(shutter, 0.25)
-				buttonDictionary.update({'shutterDown': False})
+				globals.buttonDictionary.update({'shutterDown': False})
 
 			# ISO
-			elif buttonDictionary['isoUp'] == True:
+			elif globals.buttonDictionary['isoUp'] == True:
 				if iso == 0:
 					iso = isoMin
 				elif iso >= isoMin and iso < isoMax:					
 					iso = int(iso * 2)
 				setISO(iso, 0.25)
-				buttonDictionary.update({'isoUp': False})
-			elif buttonDictionary['isoDown'] == True:
+				globals.buttonDictionary.update({'isoUp': False})
+			elif globals.buttonDictionary['isoDown'] == True:
 				if iso == 0:
 					iso = isoMax
 				elif iso <= isoMax and iso > isoMin:					
@@ -585,31 +583,31 @@ try:
 				elif iso == isoMin:
 					iso = 0
 				setISO(iso, 0.25)
-				buttonDictionary.update({'isoDown': False})
+				globals.buttonDictionary.update({'isoDown': False})
 
 			# Exposure Compensation
-			elif buttonDictionary['evUp'] == True:
+			elif globals.buttonDictionary['evUp'] == True:
 				if ev >= evMin and ev < evMax:					
 					ev = int(ev + 1)
 					setEV(ev, 0.25)
-					buttonDictionary.update({'evUp': False})
-			elif buttonDictionary['evDown'] == True:
+					globals.buttonDictionary.update({'evUp': False})
+			elif globals.buttonDictionary['evDown'] == True:
 				if ev <= evMax and ev > evMin:					
 					ev = int(ev - 1)
 					setEV(ev, 0.25)
-					buttonDictionary.update({'evDown': False})
+					globals.buttonDictionary.update({'evDown': False})
 					
 			# Exposure Bracketing
-			elif buttonDictionary['bracketUp'] == True:
+			elif globals.buttonDictionary['bracketUp'] == True:
 				if bracket < evMax:
 					bracket = int(bracket + 1)
 					setBracket(bracket, 0.25)
-					buttonDictionary.update({'bracketUp': False})
-			elif buttonDictionary['bracketDown'] == True:
+					globals.buttonDictionary.update({'bracketUp': False})
+			elif globals.buttonDictionary['bracketDown'] == True:
 				if bracket > 0:					
 					bracket = int(bracket - 1)
 					setBracket(bracket, 0.25)
-					buttonDictionary.update({'bracketDown': False})
+					globals.buttonDictionary.update({'bracketDown': False})
 
 			
 		except Exception as ex:
