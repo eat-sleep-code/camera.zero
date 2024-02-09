@@ -353,8 +353,8 @@ def postProcessImage(filePath, angle):
 def showPreview(xPosition = 0, yPosition = 0, w = 800, h = 600):
 	global previewVisible
 	try:
-		#camera.start_preview(Preview.QTGL, x=xPosition, y=yPosition, width=w, height=h) # transform=Transform(hflip=1)
-		console.debug('Show preview...')
+		if not os.environ.get('SSH_CLIENT'): 
+			camera.start_preview(Preview.DRM, x=xPosition, y=yPosition, width=w, height=h) # transform=Transform(hflip=1)
 	except Exception as ex:
 		console.warn('Could not display preview window.')
 		pass
@@ -367,8 +367,8 @@ def showPreview(xPosition = 0, yPosition = 0, w = 800, h = 600):
 def hidePreview():
 	global previewVisible
 	try:
-		#camera.stop_preview()
-		console.debug('Stop preview...')
+		if not os.environ.get('SSH_CLIENT'): 
+			camera.stop_preview()
 	except Exception as ex:
 		console.warn('Could not display preview window.')
 		pass
