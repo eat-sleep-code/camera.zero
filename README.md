@@ -71,7 +71,17 @@ If you need to control your camera via a web-based interface, please see [Camera
 
 ---
 
-## Disabling Autostart
+## Autostart
+
+### Enable
+
+To enable autostart of the program, execute the following command:
+
+```
+sudo mv /etc/service/camera.zero/run.disabled /etc/service/camera.zero/run
+```
+
+### Disable
 
 To disable autostart of the program, execute the following command:
 

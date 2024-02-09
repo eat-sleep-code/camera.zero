@@ -49,9 +49,9 @@ cd ~
 sudo svc -d /etc/service/camera.zero
 sudo rm -Rf /etc/service/camera.zero
 sudo mkdir /etc/service/camera.zero
-#sudo mv ~/camera.zero/run.disabled /etc/service/camera.zero/run
-#sudo chmod +x /etc/service/camera.zero/run
-#sudo chown -R root:root /etc/service/camera.zero
+sudo mv ~/camera.zero/run.disabled /etc/service/camera.zero/run.disabled
+sudo chmod +x /etc/service/camera.zero/run.disabled
+sudo chown -R root:root /etc/service/camera.zero
 
 
 echo ''

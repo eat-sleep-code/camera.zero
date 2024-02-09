@@ -17,7 +17,7 @@ import sys
 import threading
 import time
 
-version = '2024.02.07'
+version = '2024.02.09'
 
 
 console = Console()
@@ -381,7 +381,6 @@ def hidePreview():
 def captureImage(filePath, raw = True):
 	global rotate
 
-	console.info('Capturing ' + str(filePath) + ' ...')		
 	request = camera.switch_mode_and_capture_request(stillConfiguration)
 	request.save('main', filePath)
 	request.release()
@@ -433,6 +432,15 @@ try:
 	imageCount = 1
 	isRecording = False
 	mode = 'persistant'
+
+
+	try:
+		camera.start(show_preview=False)
+		time.sleep(1)
+	except:
+		console.warn('Could not start camera.   Is it already in use? ', '\n ')
+		pass
+	
 
 	setShutter(shutter, 0)		
 	setISO(iso, 0)
