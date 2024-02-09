@@ -350,34 +350,6 @@ def postProcessImage(filePath, angle):
 
 # ------------------------------------------------------------------------------
 
-def showPreview(xPosition = 0, yPosition = 0, w = 800, h = 600):
-	global previewVisible
-	try:
-		if not os.environ.get('SSH_CLIENT'): 
-			camera.start_preview(Preview.DRM, x=xPosition, y=yPosition, width=w, height=h) # transform=Transform(hflip=1)
-	except Exception as ex:
-		console.warn('Could not display preview window.')
-		pass
-	previewVisible = True
-	time.sleep(0.1)
-	return
-	
-# ------------------------------------------------------------------------------
-
-def hidePreview():
-	global previewVisible
-	try:
-		if not os.environ.get('SSH_CLIENT'): 
-			camera.stop_preview()
-	except Exception as ex:
-		console.warn('Could not display preview window.')
-		pass
-	previewVisible = False
-	time.sleep(0.1)
-	return
-
-# ------------------------------------------------------------------------------
-
 def captureImage(filePath, raw = True):
 	global rotate
 
@@ -426,17 +398,18 @@ try:
 	
 	console.info('Camera Zero ' + version )
 	console.print('----------------------------------------------------------------------', '\n ', '\n ')
-	
-
-
-	imageCount = 1
-	isRecording = False
-	mode = 'persistent'
-
-
+		
 	try:
+		if not os.environ.get('SSH_CLIENT'): 
+			camera.start_preview(Preview.DRM, 0, 0, previewWidth, previewHeight) # transform=Transform(hflip=1)
+	except:
+		console.warn('Could not start preview. ' + str(ex), '\n ')
+		pass
+
+
+	try:	
 		camera.start(show_preview=False)
-		time.sleep(1)
+		time.sleep(1.0)
 	except:
 		console.warn('Could not start camera.   Is it already in use? ', '\n ')
 		pass
@@ -448,9 +421,11 @@ try:
 	setEV(ev, 0)
 	setBracket(bracket, 0)
 	setAWB(awb, 0)
-	
-	
-	showPreview(0, 0, previewWidth, previewHeight)
+
+	imageCount = 1
+	isRecording = False
+	mode = 'persistent'
+
 	
 	while True:
 		try:
