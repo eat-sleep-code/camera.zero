@@ -1,4 +1,5 @@
 import board
+import globals
 import neopixel
 import os
 import threading
